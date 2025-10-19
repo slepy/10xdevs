@@ -1,6 +1,6 @@
 # BlindInvest
 
-A cutting-edge MVP designed to simplify the investment process by aggregating offers from multiple platforms. Helps investors easily browse, evaluate, and commit to investment opportunities while providing administrators with full control over offers and investments.
+A cutting-edge MVP designed to simplify the investment process by aggregating offers from multiple platforms. BlindInvest helps investors easily browse, evaluate, and commit to investment opportunities while providing administrators with full control over offers and investments.
 
 ## Table of Contents
 
