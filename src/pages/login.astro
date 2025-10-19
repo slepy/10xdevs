@@ -1,0 +1,28 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { LoginForm } from "../components/forms/LoginForm";
+
+const title = "Zaloguj się | BlindInvest";
+
+// Check if user is already logged in
+// TODO: This will be implemented when middleware is ready
+// const user = Astro.locals.user;
+// if (user) {
+//   return Astro.redirect("/offers");
+// }
+---
+
+<Layout title={title}>
+  <main class="flex-1 flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8" data-testid="login-page">
+    <div class="max-w-md w-full space-y-8" data-testid="login-container">
+      <div class="text-center" data-testid="login-header">
+        <h1 class="text-3xl font-bold text-gray-900 mb-2" data-testid="login-title">Zaloguj się</h1>
+        <p class="text-gray-600" data-testid="login-subtitle">Wprowadź swoje dane, aby uzyskać dostęp do konta</p>
+      </div>
+
+      <div class="bg-white shadow-md rounded-lg p-8" data-testid="login-form-container">
+        <LoginForm client:load />
+      </div>
+    </div>
+  </main>
+</Layout>

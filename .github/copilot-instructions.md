@@ -9,6 +9,15 @@
 - React 19
 - Tailwind 4
 - Shadcn/ui
+- Supabase
+
+### Testing
+
+- Vitest - Unit and integration testing
+- React Testing Library - React component testing
+- Playwright - End-to-end testing
+- Mock Service Worker (MSW) - API mocking
+- @axe-core/react - Accessibility testing
 
 ## Project Structure
 
@@ -81,7 +90,7 @@ When modifying the directory structure, always update this section.
 - Leverage View Transitions API for smooth page transitions (use ClientRouter)
 - Use content collections with type safety for blog posts, documentation, etc.
 - Leverage Server Endpoints for API routes
-- Use POST, GET  - uppercase format for endpoint handlers
+- Use POST, GET - uppercase format for endpoint handlers
 - Use `export const prerender = false` for API routes
 - Use zod for input validation in API routes
 - Extract logic into services in `src/lib/services`
@@ -111,3 +120,197 @@ When modifying the directory structure, always update this section.
 - Use Zod schemas to validate data exchanged with the backend.
 - Use supabase from context.locals in Astro routes instead of importing supabaseClient directly
 - Use SupabaseClient type from `src/db/supabase.client.ts`, not from `@supabase/supabase-js`
+
+## Testing Guidelines
+
+### General Testing Principles
+
+- Write tests for all business-critical functionality
+- Colocate unit tests with source files (e.g., `auth.service.test.ts` next to `auth.service.ts`)
+- Place E2E tests in `tests/e2e/` directory
+- Follow the testing pyramid: many unit tests, fewer integration tests, critical E2E tests
+- Aim for meaningful test coverage, not just high percentages
+
+### Unit Testing with Vitest
+
+- Use `describe` blocks to group related tests
+- Write descriptive test names that explain the expected behavior
+- Mock external dependencies (Supabase, APIs) using `vi.mock()`
+- Test both success and error scenarios
+- Test edge cases and boundary conditions
+- Use `beforeEach` and `afterEach` for test setup and cleanup
+
+Example:
+
+```typescript
+import { describe, it, expect, vi, beforeEach } from "vitest";
+
+describe("AuthService", () => {
+  let mockSupabase;
+
+  beforeEach(() => {
+    mockSupabase = {
+      auth: {
+        signInWithPassword: vi.fn(),
+      },
+    };
+  });
+
+  it("should successfully login with valid credentials", async () => {
+    mockSupabase.auth.signInWithPassword.mockResolvedValue({
+      data: { user: { id: "1" } },
+    });
+
+    const service = new AuthService(mockSupabase);
+    const result = await service.login({ email: "test@example.com", password: "pass" });
+
+    expect(result.user.id).toBe("1");
+  });
+});
+```
+
+### Component Testing with React Testing Library
+
+- Test components from the user's perspective
+- Use `render` from React Testing Library to render components
+- Query elements using accessible queries (getByRole, getByLabelText)
+- Simulate user interactions with `userEvent` or `fireEvent`
+- Test accessibility with `@axe-core/react`
+- Avoid testing implementation details
+
+Example:
+
+```typescript
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { LoginForm } from './LoginForm';
+
+it('should submit form with user input', async () => {
+  const handleSubmit = vi.fn();
+  render(<LoginForm onSubmit={handleSubmit} />);
+
+  await userEvent.type(screen.getByLabelText(/email/i), 'test@example.com');
+  await userEvent.type(screen.getByLabelText(/password/i), 'password123');
+  await userEvent.click(screen.getByRole('button', { name: /login/i }));
+
+  expect(handleSubmit).toHaveBeenCalledWith({
+    email: 'test@example.com',
+    password: 'password123'
+  });
+});
+```
+
+### Integration Testing with MSW
+
+- Use Mock Service Worker to mock API endpoints at the network level
+- Create handlers for API routes that match your application's endpoints
+- Test the interaction between components and API calls
+- Verify loading states, success states, and error handling
+
+Example:
+
+```typescript
+import { setupServer } from "msw/node";
+import { http, HttpResponse } from "msw";
+
+const server = setupServer(
+  http.post("/api/auth/login", () => {
+    return HttpResponse.json({ data: { user: { id: "1" } } });
+  })
+);
+
+beforeAll(() => server.listen());
+afterEach(() => server.resetHandlers());
+afterAll(() => server.close());
+```
+
+### E2E Testing with Playwright
+
+- Test critical user journeys end-to-end
+- Use Page Object Model pattern for complex flows
+- Wait for elements using Playwright's auto-waiting features
+- Test across different browsers when necessary
+- Use `test.beforeEach` for common setup (navigation, authentication)
+- Use data-testid attributes sparingly, prefer accessible selectors
+
+Example:
+
+```typescript
+import { test, expect } from "@playwright/test";
+
+test.describe("Authentication Flow", () => {
+  test("user can register and login", async ({ page }) => {
+    await page.goto("/register");
+    await page.fill('input[name="email"]', "test@example.com");
+    await page.fill('input[name="password"]', "ValidPass123");
+    await page.click('button[type="submit"]');
+
+    await expect(page).toHaveURL("/");
+    await expect(page.locator("text=Welcome")).toBeVisible();
+  });
+});
+```
+
+### API Testing
+
+- Test API endpoints directly with Vitest
+- Verify authorization checks (401 for unauthenticated, 403 for forbidden)
+- Test input validation (400 for invalid data)
+- Test successful operations with correct response structure
+- Test error handling and proper status codes
+
+### Testing Zod Validators
+
+- Test all validation schemas with valid inputs
+- Test with invalid inputs and verify error messages
+- Test edge cases (empty strings, special characters, boundary values)
+- Test optional vs required fields
+
+Example:
+
+```typescript
+import { describe, it, expect } from "vitest";
+import { loginSchema } from "./auth.validator";
+
+describe("loginSchema", () => {
+  it("should accept valid login data", () => {
+    const result = loginSchema.safeParse({
+      email: "test@example.com",
+      password: "ValidPass123",
+    });
+
+    expect(result.success).toBe(true);
+  });
+
+  it("should reject invalid email", () => {
+    const result = loginSchema.safeParse({
+      email: "invalid-email",
+      password: "ValidPass123",
+    });
+
+    expect(result.success).toBe(false);
+    expect(result.error?.issues[0].path).toEqual(["email"]);
+  });
+});
+```
+
+### Accessibility Testing
+
+- Run axe checks in component tests using `@axe-core/react`
+- Test keyboard navigation (Tab order, Enter/Space for actions)
+- Verify ARIA attributes are correct
+- Test with reduced motion preferences
+- Ensure proper focus management
+
+Example:
+
+```typescript
+import { axe, toHaveNoViolations } from 'jest-axe';
+expect.extend(toHaveNoViolations);
+
+it('should have no accessibility violations', async () => {
+  const { container } = render(<LoginForm />);
+  const results = await axe(container);
+  expect(results).toHaveNoViolations();
+});
+```

@@ -1,0 +1,10 @@
+{
+  "servers": {
+    "10x-mvp-tracker": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["@przeprogramowani/10x-mvp-tracker"]
+    }
+  },
+  "inputs": []
+}

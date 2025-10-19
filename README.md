@@ -1,94 +1,108 @@
-# 10x Astro Starter
+# BlindInvest
 
-A modern, opinionated starter template for building fast, accessible, and AI-friendly web applications.
+A cutting-edge MVP designed to simplify the investment process by aggregating offers from multiple platforms. BlindInvest helps investors easily browse, evaluate, and commit to investment opportunities while providing administrators with full control over offers and investments.
+
+## Table of Contents
+
+- [Project Name](#project-name)
+- [Project Description](#project-description)
+- [Tech Stack](#tech-stack)
+- [Getting Started Locally](#getting-started-locally)
+- [Available Scripts](#available-scripts)
+- [Project Scope](#project-scope)
+- [Project Status](#project-status)
+- [License](#license)
+
+## Project Name
+
+BlindInvest
+
+## Project Description
+
+BlindInvest is an MVP web application that streamlines the investment process. It aggregates investment opportunities from various sources, allowing investors to quickly review and commit to investments while enabling administrators to manage offers, user registrations, and the overall investment lifecycle. With a focus on performance, security, and a seamless user experience, BlindInvest provides both investors and administrators with a robust and intuitive platform.
 
 ## Tech Stack
 
-- [Astro](https://astro.build/) v5.5.5 - Modern web framework for building fast, content-focused websites
-- [React](https://react.dev/) v19.0.0 - UI library for building interactive components
-- [TypeScript](https://www.typescriptlang.org/) v5 - Type-safe JavaScript
-- [Tailwind CSS](https://tailwindcss.com/) v4.0.17 - Utility-first CSS framework
+- **Astro 5** – A fast, content-focused web framework.
+- **React 19** – For dynamic, interactive UI components.
+- **TypeScript 5** – For static type checking and improved code quality.
+- **Tailwind CSS 4** – Utility-first CSS framework for efficient styling.
+- **Shadcn/ui** – Pre-built, accessible UI components.
+- **Supabase** – Backend-as-a-Service for authentication, database, and storage.
 
-## Prerequisites
+### Testing
 
-- Node.js v22.14.0 (as specified in `.nvmrc`)
-- npm (comes with Node.js)
+- **Vitest** – Modern, fast test runner with excellent Vite/Astro integration for unit and integration tests.
+- **React Testing Library** – Testing React components the way users interact with them.
+- **Playwright** – End-to-end testing framework for simulating real user workflows across browsers.
+- **Mock Service Worker (MSW)** – API mocking library for integration tests.
+- **@axe-core/react** – Accessibility testing integrated with React Testing Library.
 
-## Getting Started
+## Getting Started Locally
 
-1. Clone the repository:
+1. **Prerequisites**:
+   - Ensure you have [Node.js](https://nodejs.org/) installed. Refer to the `.nvmrc` file for the preferred Node.js version.
 
-```bash
-git clone https://github.com/przeprogramowani/10x-astro-starter.git
-cd 10x-astro-starter
-```
+2. **Clone the repository**:
 
-2. Install dependencies:
+   ```sh
+   git clone https://github.com/slepy/10xdevs.git
+   cd 10xdevs
+   ```
 
-```bash
-npm install
-```
+3. **Install dependencies**:
 
-3. Run the development server:
+   ```sh
+   npm install
+   ```
 
-```bash
-npm run dev
-```
+4. **Run the development server**:
 
-4. Build for production:
+   ```sh
+   npm run dev
+   ```
 
-```bash
-npm run build
-```
+5. **Build for production**:
+
+   ```sh
+   npm run build
+   ```
+
+6. **Preview the production build**:
+
+   ```sh
+   npm run preview
+   ```
 
 ## Available Scripts
 
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run preview` - Preview production build
-- `npm run lint` - Run ESLint
-- `npm run lint:fix` - Fix ESLint issues
+- **dev**: Start the Astro development server.
+- **build**: Create a production build.
+- **preview**: Preview the production build locally.
+- **lint**: Run ESLint to analyze code quality.
+- **lint:fix**: Automatically fix lint issues.
+- **format**: Format code using Prettier.
+- **test**: Run unit and integration tests with Vitest.
+- **test:watch**: Run tests in watch mode.
+- **test:coverage**: Generate test coverage report.
+- **test:e2e**: Run end-to-end tests with Playwright.
+- **test:e2e:ui**: Run E2E tests with Playwright UI mode.
 
-## Project Structure
+## Project Scope
 
-```md
-.
-├── src/
-│   ├── layouts/    # Astro layouts
-│   ├── pages/      # Astro pages
-│   │   └── api/    # API endpoints
-│   ├── components/ # UI components (Astro & React)
-│   └── assets/     # Static assets
-├── public/         # Public assets
-```
+The current MVP of BlindInvest includes:
 
-## AI Development Support
+- **Authentication**: Registration and login functionality for both investors and administrators.
+- **User Management**: Administrators can view and manage registered users.
+- **Offer Management**: Administrators can create, edit, and manage investment offers.
+- **Investment Process**: Investors can browse offers and submit investment declarations.
+- **Investment Tracking**: Both investors and administrators can monitor the status of investments.
+- **Document Management**: Administrators can attach and manage documents related to investments.
 
-This project is configured with AI development tools to enhance the development experience, providing guidelines for:
+## Project Status
 
-- Project structure
-- Coding practices
-- Frontend development
-- Styling with Tailwind
-- Accessibility best practices
-- Astro and React guidelines
-
-### Cursor IDE
-
-The project includes AI rules in `.cursor/rules/` directory that help Cursor IDE understand the project structure and provide better code suggestions.
-
-### GitHub Copilot
-
-AI instructions for GitHub Copilot are available in `.github/copilot-instructions.md`
-
-### Windsurf
-
-The `.windsurfrules` file contains AI configuration for Windsurf.
-
-## Contributing
-
-Please follow the AI guidelines and coding practices defined in the AI configuration files when contributing to this project.
+The project is currently in the **MVP** stage, making it ready for initial user testing and iterative development based on feedback.
 
 ## License
 
-MIT
+This project is licensed under the **MIT License**.

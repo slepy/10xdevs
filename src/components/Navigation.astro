@@ -1,0 +1,13 @@
+---
+import { Navigation as NavigationComponent } from "./ui/Navigation";
+import type { UserDTO } from "../types";
+
+interface Props {
+  user?: UserDTO | null;
+  currentPath?: string;
+}
+
+const { user, currentPath } = Astro.props;
+---
+
+<NavigationComponent client:load user={user} currentPath={currentPath} />

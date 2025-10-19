@@ -1,0 +1,35 @@
+---
+import type { UserDTO, UserRole } from "../types";
+
+interface Props {
+  requireAuth?: boolean;
+  requireRole?: UserRole;
+  redirectTo?: string;
+}
+
+const { requireAuth = true, requireRole, redirectTo = "/login" } = Astro.props;
+
+// Get user from context (set by middleware)
+const user = Astro.locals.user as UserDTO | null;
+
+// Check authentication requirement
+if (requireAuth && !user) {
+  const currentUrl = Astro.url.pathname + Astro.url.search;
+  return Astro.redirect(`${redirectTo}?redirect=${encodeURIComponent(currentUrl)}`);
+}
+
+// Check role requirement
+if (requireRole && (!user || user.role !== requireRole)) {
+  if (!user) {
+    // User not authenticated, redirect to login
+    const currentUrl = Astro.url.pathname + Astro.url.search;
+    return Astro.redirect(`${redirectTo}?redirect=${encodeURIComponent(currentUrl)}`);
+  } else {
+    // User authenticated but doesn't have required role, redirect to home
+    return Astro.redirect("/");
+  }
+}
+---
+
+<!-- AuthGuard doesn't render anything, it just handles redirects -->
+<slot />
