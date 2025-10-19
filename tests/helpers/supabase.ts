@@ -86,12 +86,12 @@ export function mockAuthSuccess(client: SupabaseClient, userType: "admin" | "sig
   vi.mocked(client.auth.getUser).mockResolvedValue({
     data: { user },
     error: null,
-  } as any);
+  } as never);
 
   vi.mocked(client.auth.getSession).mockResolvedValue({
     data: { session },
     error: null,
-  } as any);
+  } as never);
 
   return { user, session };
 }
@@ -103,10 +103,10 @@ export function mockAuthFailure(client: SupabaseClient) {
   vi.mocked(client.auth.getUser).mockResolvedValue({
     data: { user: null },
     error: { message: "Unauthorized", name: "AuthError", status: 401 },
-  } as any);
+  } as never);
 
   vi.mocked(client.auth.getSession).mockResolvedValue({
     data: { session: null },
     error: { message: "No session", name: "AuthError", status: 401 },
-  } as any);
+  } as never);
 }

@@ -31,12 +31,12 @@ describe("AuthService", () => {
       vi.mocked(mockSupabase.auth.signUp).mockResolvedValue({
         data: { user: mockUser, session: mockSession },
         error: null,
-      } as any);
+      } as never);
 
       vi.mocked(mockSupabase.auth.setSession).mockResolvedValue({
         data: { session: mockSession, user: mockUser },
         error: null,
-      } as any);
+      } as never);
 
       const result = await authService.register("New", "User", "newuser@example.com", "password123");
 
@@ -73,7 +73,7 @@ describe("AuthService", () => {
       vi.mocked(mockSupabase.auth.signUp).mockResolvedValue({
         data: { user: mockUser, session: null },
         error: null,
-      } as any);
+      } as never);
 
       const result = await authService.register("New", "User", "newuser@example.com", "password123");
 
@@ -84,7 +84,7 @@ describe("AuthService", () => {
       vi.mocked(mockSupabase.auth.signUp).mockResolvedValue({
         data: { user: null, session: null },
         error: { message: "User already registered", name: "AuthError", status: 409 },
-      } as any);
+      } as never);
 
       await expect(authService.register("Existing", "User", "existing@example.com", "password123")).rejects.toThrow(
         "Użytkownik o tym adresie e-mail już istnieje"
@@ -97,7 +97,7 @@ describe("AuthService", () => {
       vi.mocked(mockSupabase.auth.signUp).mockResolvedValue({
         data: { user: null, session: null },
         error: { message: "Invalid email", name: "AuthError", status: 400 },
-      } as any);
+      } as never);
 
       await expect(authService.register("Invalid", "User", "invalid-email", "password123")).rejects.toThrow(
         "Nieprawidłowy format adresu e-mail"
@@ -124,7 +124,7 @@ describe("AuthService", () => {
       vi.mocked(mockSupabase.auth.signInWithPassword).mockResolvedValue({
         data: { session: mockSession, user: mockUser },
         error: null,
-      } as any);
+      } as never);
 
       const result = await authService.login("user@example.com", "password123");
 
@@ -141,7 +141,7 @@ describe("AuthService", () => {
       vi.mocked(mockSupabase.auth.signInWithPassword).mockResolvedValue({
         data: { session: null, user: null },
         error: { message: "Invalid login credentials", name: "AuthError", status: 401 },
-      } as any);
+      } as never);
 
       await expect(authService.login("user@example.com", "wrongpassword")).rejects.toThrow(
         "Nieprawidłowy e-mail lub hasło"
@@ -152,7 +152,7 @@ describe("AuthService", () => {
       vi.mocked(mockSupabase.auth.signInWithPassword).mockResolvedValue({
         data: { session: null, user: null },
         error: { message: "Email not confirmed", name: "AuthError", status: 400 },
-      } as any);
+      } as never);
 
       await expect(authService.login("unconfirmed@example.com", "password123")).rejects.toThrow(
         "E-mail nie został potwierdzony. Sprawdź swoją skrzynkę pocztową."
@@ -164,7 +164,7 @@ describe("AuthService", () => {
     it("should logout user successfully", async () => {
       vi.mocked(mockSupabase.auth.signOut).mockResolvedValue({
         error: null,
-      } as any);
+      } as never);
 
       await expect(authService.logout()).resolves.not.toThrow();
       expect(mockSupabase.auth.signOut).toHaveBeenCalled();
@@ -173,7 +173,7 @@ describe("AuthService", () => {
     it("should throw error when logout fails", async () => {
       vi.mocked(mockSupabase.auth.signOut).mockResolvedValue({
         error: { message: "Logout failed", name: "AuthError", status: 500 },
-      } as any);
+      } as never);
 
       await expect(authService.logout()).rejects.toThrow("Błąd podczas wylogowywania");
     });
@@ -191,7 +191,7 @@ describe("AuthService", () => {
       vi.mocked(mockSupabase.auth.admin.getUserById).mockResolvedValue({
         data: { user: mockAdminUser },
         error: null,
-      } as any);
+      } as never);
 
       const result = await authService.isAdmin("admin-id");
 
@@ -210,7 +210,7 @@ describe("AuthService", () => {
       vi.mocked(mockSupabase.auth.admin.getUserById).mockResolvedValue({
         data: { user: mockSignerUser },
         error: null,
-      } as any);
+      } as never);
 
       const result = await authService.isAdmin("signer-id");
 
@@ -221,7 +221,7 @@ describe("AuthService", () => {
       vi.mocked(mockSupabase.auth.admin.getUserById).mockResolvedValue({
         data: { user: null },
         error: { message: "User not found", name: "AuthError", status: 404 },
-      } as any);
+      } as never);
 
       const result = await authService.isAdmin("nonexistent-id");
 

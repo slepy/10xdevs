@@ -21,24 +21,24 @@ export function setupMswServer() {
  */
 export const handlers = {
   auth: {
-    register: (response?: any, status = 200) =>
+    register: (response?: unknown, status = 200) =>
       http.post("/api/auth/register", () => {
         return HttpResponse.json(response || { data: { user: { id: "1", email: "test@example.com" } } }, { status });
       }),
 
-    login: (response?: any, status = 200) =>
+    login: (response?: unknown, status = 200) =>
       http.post("/api/auth/login", () => {
         return HttpResponse.json(response || { data: { user: { id: "1", email: "test@example.com" } } }, { status });
       }),
 
-    logout: (response?: any, status = 200) =>
+    logout: (response?: unknown, status = 200) =>
       http.post("/api/auth/logout", () => {
         return HttpResponse.json(response || { data: { success: true } }, { status });
       }),
   },
 
   offers: {
-    list: (response?: any, status = 200) =>
+    list: (response?: unknown, status = 200) =>
       http.get("/api/offers", () => {
         return HttpResponse.json(
           response || {
@@ -55,7 +55,7 @@ export const handlers = {
         );
       }),
 
-    get: (response?: any, status = 200) =>
+    get: (response?: unknown, status = 200) =>
       http.get("/api/offers/:id", () => {
         return HttpResponse.json(
           response || {
@@ -70,7 +70,7 @@ export const handlers = {
         );
       }),
 
-    create: (response?: any, status = 201) =>
+    create: (response?: unknown, status = 201) =>
       http.post("/api/offers", () => {
         return HttpResponse.json(
           response || {
@@ -85,7 +85,7 @@ export const handlers = {
         );
       }),
 
-    update: (response?: any, status = 200) =>
+    update: (response?: unknown, status = 200) =>
       http.put("/api/offers/:id", () => {
         return HttpResponse.json(
           response || {
@@ -100,14 +100,14 @@ export const handlers = {
         );
       }),
 
-    delete: (response?: any, status = 200) =>
+    delete: (response?: unknown, status = 200) =>
       http.delete("/api/offers/:id", () => {
         return HttpResponse.json(response || { data: { success: true } }, { status });
       }),
   },
 
   investments: {
-    list: (response?: any, status = 200) =>
+    list: (response?: unknown, status = 200) =>
       http.get("/api/investments", () => {
         return HttpResponse.json(
           response || {
@@ -125,7 +125,7 @@ export const handlers = {
         );
       }),
 
-    create: (response?: any, status = 201) =>
+    create: (response?: unknown, status = 201) =>
       http.post("/api/investments", () => {
         return HttpResponse.json(
           response || {
@@ -141,7 +141,7 @@ export const handlers = {
         );
       }),
 
-    update: (response?: any, status = 200) =>
+    update: (response?: unknown, status = 200) =>
       http.put("/api/investments/:id", () => {
         return HttpResponse.json(
           response || {

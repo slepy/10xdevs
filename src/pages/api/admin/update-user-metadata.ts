@@ -19,7 +19,6 @@ export const POST: APIRoute = async ({ request, locals }) => {
     });
 
     if (error) {
-      console.error("Error updating user:", error);
       return new Response(JSON.stringify({ error: error.message, code: error.code }), { status: 500 });
     }
 
@@ -34,8 +33,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
       }),
       { status: 200 }
     );
-  } catch (err) {
-    console.error("Unexpected error:", err);
+  } catch {
     return new Response(JSON.stringify({ error: "Internal server error" }), { status: 500 });
   }
 };
