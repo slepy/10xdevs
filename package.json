@@ -19,6 +19,7 @@
     "test:e2e:debug": "playwright test --debug"
   },
   "dependencies": {
+    "@astrojs/cloudflare": "^12.6.10",
     "@astrojs/node": "^9.4.4",
     "@astrojs/react": "^4.4.0",
     "@astrojs/sitemap": "^3.6.0",
