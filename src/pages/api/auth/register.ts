@@ -3,10 +3,11 @@ import { registerSchema } from "../../../lib/validators/auth.validator";
 import type { RegisterResponse, ApiResponse } from "../../../types";
 import type { ZodIssue } from "zod";
 import { AuthService } from "../../../lib/services/auth.service";
+import { withFeatureFlag } from "../../../features";
 
 export const prerender = false;
 
-export const POST: APIRoute = async ({ request, locals }) => {
+export const POST: APIRoute = withFeatureFlag("auth", async ({ request, locals }) => {
   try {
     // Parse request body
     const body = await request.json();
@@ -122,4 +123,4 @@ export const POST: APIRoute = async ({ request, locals }) => {
       }
     );
   }
-};
+});

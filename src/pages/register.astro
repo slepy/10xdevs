@@ -1,8 +1,14 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import { RegisterForm } from "../components/forms/RegisterForm";
+import { isFeatureEnabled } from "../features";
 
 const title = "Zarejestruj się | BlindInvest";
+
+// Check if auth feature is enabled
+if (!isFeatureEnabled("auth")) {
+  return Astro.redirect("/");
+}
 
 // Check if user is already logged in
 // TODO: This will be implemented when middleware is ready

@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { BaseButton } from "../base";
 import type { UserDTO } from "../../types";
+import { FeatureFlag } from "@/features";
 
 interface AuthButtonProps {
   user?: UserDTO | null;
@@ -102,9 +103,11 @@ export function AuthButton({ user, className = "" }: AuthButtonProps) {
   // If user is not logged in, show login button
   if (!user) {
     return (
-      <div className={className}>
-        <BaseButton href="/login">Zaloguj się</BaseButton>
-      </div>
+      <FeatureFlag feature="auth">
+        <div className={className}>
+          <BaseButton href="/login">Zaloguj się</BaseButton>
+        </div>
+      </FeatureFlag>
     );
   }
 

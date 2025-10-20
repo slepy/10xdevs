@@ -3,6 +3,7 @@ import { createOfferSchema } from "../../lib/validators/offers.validator";
 import { OffersService } from "../../lib/services/offers.service";
 import type { ApiResponse, OfferDTO, ValidationError } from "../../types";
 import { USER_ROLES } from "../../types";
+import { withFeatureFlag } from "../../features";
 
 export const prerender = false;
 
@@ -10,7 +11,7 @@ export const prerender = false;
  * POST /api/offers
  * Tworzy nową ofertę inwestycyjną (tylko dla administratorów)
  */
-export const POST: APIRoute = async ({ request, locals }) => {
+export const POST: APIRoute = withFeatureFlag("offers-create", async ({ request, locals }) => {
   try {
     // 1. Sprawdzenie autoryzacji
     const user = locals.user;
@@ -125,4 +126,4 @@ export const POST: APIRoute = async ({ request, locals }) => {
       }
     );
   }
-};
+});

@@ -83,21 +83,6 @@ Niniejsza specyfikacja opisuje architekturę systemu autentykacji dla aplikacji 
   - Dropdown z opcjami: Profil, Moje Inwestycje, Panel Admin (jeśli admin), Wyloguj
   - Obsługa wylogowywania przez API endpoint
 
-- **`src/components/ui/ProtectedContent.tsx`**
-
-  ```typescript
-  interface ProtectedContentProps {
-    user?: UserDTO | null;
-    requireRole?: "admin" | "signer";
-    fallback?: React.ReactNode;
-    children: React.ReactNode;
-  }
-  ```
-
-  - Warunkowe renderowanie treści na podstawie autoryzacji
-  - Obsługa różnych ról użytkowników
-  - Fallback component dla nieautoryzowanych użytkowników
-
 ### 2.3. Komponenty Astro (Static)
 
 #### 2.3.1. Layout Components

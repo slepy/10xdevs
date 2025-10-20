@@ -1,6 +1,12 @@
 ---
 import Layout from "../../layouts/Layout.astro";
 import AuthGuard from "../../components/AuthGuard.astro";
+import { isFeatureEnabled } from "../../features";
+
+// Check if offers-list feature is enabled
+if (!isFeatureEnabled("offers-list")) {
+  return Astro.redirect("/");
+}
 ---
 
 <AuthGuard>

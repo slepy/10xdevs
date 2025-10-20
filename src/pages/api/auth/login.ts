@@ -2,10 +2,11 @@ import type { APIRoute } from "astro";
 import { loginSchema } from "../../../lib/validators/auth.validator";
 import type { LoginResponse, ApiResponse } from "../../../types";
 import { AuthService } from "../../../lib/services/auth.service";
+import { withFeatureFlag } from "../../../features";
 
 export const prerender = false;
 
-export const POST: APIRoute = async ({ request, locals }) => {
+export const POST: APIRoute = withFeatureFlag("auth", async ({ request, locals }) => {
   try {
     // Parse request body
     const body = await request.json();
@@ -90,4 +91,4 @@ export const POST: APIRoute = async ({ request, locals }) => {
       }
     );
   }
-};
+});

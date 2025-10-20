@@ -1,10 +1,11 @@
 import type { APIRoute } from "astro";
 import type { LogoutResponse, ApiResponse } from "../../../types";
 import { AuthService } from "../../../lib/services/auth.service";
+import { withFeatureFlag } from "../../../features";
 
 export const prerender = false;
 
-export const POST: APIRoute = async ({ locals }) => {
+export const POST: APIRoute = withFeatureFlag("auth", async ({ locals }) => {
   try {
     // Get Supabase client from locals
     const supabase = locals.supabase;
@@ -58,4 +59,4 @@ export const POST: APIRoute = async ({ locals }) => {
       }
     );
   }
-};
+});
