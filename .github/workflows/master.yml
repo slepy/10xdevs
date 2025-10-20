@@ -84,10 +84,6 @@ jobs:
     needs: build
     env:
       NODE_ENV: production
-      # Ensure action can access Cloudflare secrets at runtime
-      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-      CLOUDFLARE_PROJECT_NAME: ${{ secrets.CLOUDFLARE_PROJECT_NAME }}
 
     steps:
       - name: Checkout code
