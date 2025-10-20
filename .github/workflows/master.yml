@@ -84,6 +84,10 @@ jobs:
     needs: build
     env:
       NODE_ENV: production
+      # Ensure action can access Cloudflare secrets at runtime
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CLOUDFLARE_PROJECT_NAME: ${{ secrets.CLOUDFLARE_PROJECT_NAME }}
 
     steps:
       - name: Checkout code
@@ -97,10 +101,20 @@ jobs:
 
       - name: Deploy to Cloudflare Pages
         uses: cloudflare/wrangler-action@v3
+        # Wrangler requires CLOUDFLARE_API_TOKEN in environment for non-interactive
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy dist --project-name=${{ secrets.CLOUDFLARE_PROJECT_NAME }}
+          # Use the secret project name; action will run `wrangler pages deploy dist --project-name=<name>`
+          command: pages deploy dist --project-name=${{ env.CLOUDFLARE_PROJECT_NAME }}
+
+      - name: Debug: show masked secret presence
+        if: ${{ github.actor == 'slepy' || always() }}
+        run: |
+          echo "CLOUDFLARE_API_TOKEN set: ${CLOUDFLARE_API_TOKEN:+yes}"
+          echo "CLOUDFLARE_PROJECT_NAME set: ${CLOUDFLARE_PROJECT_NAME:+yes}"
 
   deployment-status:
     name: Deployment Status
