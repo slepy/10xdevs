@@ -101,14 +101,11 @@ jobs:
 
       - name: Deploy to Cloudflare Pages
         uses: cloudflare/wrangler-action@v3
-        # Wrangler requires CLOUDFLARE_API_TOKEN in environment for non-interactive
         env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          # Use the secret project name; action will run `wrangler pages deploy dist --project-name=<name>`
-          command: pages deploy dist --project-name=${{ env.CLOUDFLARE_PROJECT_NAME }}
+          command: pages deploy dist --project-name=${{ secrets.CLOUDFLARE_PROJECT_NAME }}
 
       # Debug step removed: verified secrets presence during development and removed to keep logs clean
 
