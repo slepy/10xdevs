@@ -183,7 +183,6 @@ Required in `.env`:
 ```
 SUPABASE_URL=
 SUPABASE_KEY=
-OPENROUTER_API_KEY=
 ```
 
 Environment variables accessed via `import.meta.env` (typed in `src/env.d.ts`)

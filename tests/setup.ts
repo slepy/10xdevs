@@ -11,7 +11,6 @@ afterEach(() => {
 vi.mock("astro:env/client", () => ({
   SUPABASE_URL: "http://localhost:54321",
   SUPABASE_KEY: "test-key",
-  OPENROUTER_API_KEY: "test-openrouter-key",
 }));
 
 // Mock window.matchMedia for components that use media queries
