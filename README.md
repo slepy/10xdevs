@@ -19,7 +19,7 @@ BlindInvest
 
 ## Project Description
 
-BlindInvest is an MVP web application that streamlines the investment process. It aggregates investment opportunities from various sources, allowing investors to quickly review and commit to investments while enabling administrators to manage offers, user registrations, and the overall investment lifecycle. With a focus on performance, security, and a seamless user experience, BlindInvest provides both investors and administrators with a robust and intuitive platform.
+BlindInvest.io is an MVP web application that streamlines the investment process. It aggregates investment opportunities from various sources, allowing investors to quickly review and commit to investments while enabling administrators to manage offers, user registrations, and the overall investment lifecycle. With a focus on performance, security, and a seamless user experience, BlindInvest provides both investors and administrators with a robust and intuitive platform.
 
 ## Tech Stack
 
