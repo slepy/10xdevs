@@ -108,7 +108,7 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy dist --project-name='10xdevs'
+          command: pages deploy dist --project-name=10xdevs
 
       # Debug step removed: verified secrets presence during development and removed to keep logs clean
 
