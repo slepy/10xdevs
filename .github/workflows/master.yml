@@ -110,11 +110,7 @@ jobs:
           # Use the secret project name; action will run `wrangler pages deploy dist --project-name=<name>`
           command: pages deploy dist --project-name=${{ env.CLOUDFLARE_PROJECT_NAME }}
 
-      - name: Debug: show masked secret presence
-        if: ${{ github.actor == 'slepy' || always() }}
-        run: |
-          echo "CLOUDFLARE_API_TOKEN set: ${CLOUDFLARE_API_TOKEN:+yes}"
-          echo "CLOUDFLARE_PROJECT_NAME set: ${CLOUDFLARE_PROJECT_NAME:+yes}"
+      # Debug step removed: verified secrets presence during development and removed to keep logs clean
 
   deployment-status:
     name: Deployment Status
