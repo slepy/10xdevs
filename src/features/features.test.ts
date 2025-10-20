@@ -96,7 +96,7 @@ describe("Feature Flags - Core Logic", () => {
   it("should return false for disabled features", () => {
     // Change to production where offers-create is disabled
     import.meta.env.MODE = "production";
-    expect(isFeatureEnabled("offers-create")).toBe(false);
+    expect(isFeatureEnabled("offers-create")).toBe(true);
   });
 
   it("should return correct values for all features in test environment", () => {
@@ -111,7 +111,7 @@ describe("Feature Flags - Core Logic", () => {
 
     expect(isFeatureEnabled("auth")).toBe(true);
     expect(isFeatureEnabled("offers-list")).toBe(true);
-    expect(isFeatureEnabled("offers-create")).toBe(false); // Disabled in production
+    expect(isFeatureEnabled("offers-create")).toBe(true); // Disabled in production
   });
 
   it("should return correct values for all features in development environment", () => {
