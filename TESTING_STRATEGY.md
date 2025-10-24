@@ -187,9 +187,9 @@ npm install --save-dev @axe-core/react
 
 ```typescript
 // tests/setup.ts
-import '@testing-library/jest-dom';
-import { cleanup } from '@testing-library/react';
-import { afterEach, beforeAll, afterAll } from 'vitest';
+import "@testing-library/jest-dom";
+import { cleanup } from "@testing-library/react";
+import { afterEach, beforeAll, afterAll } from "vitest";
 
 afterEach(() => {
   cleanup();
@@ -200,11 +200,11 @@ afterEach(() => {
 
 ```typescript
 // tests/helpers/msw.ts
-import { setupServer } from 'msw/node';
-import { http, HttpResponse } from 'msw';
+import { setupServer } from "msw/node";
+import { http, HttpResponse } from "msw";
 
 export const server = setupServer(
-  http.post('/api/auth/login', () => {
+  http.post("/api/auth/login", () => {
     return HttpResponse.json({ data: { user: mockUser, session: mockSession } });
   })
 );
@@ -220,7 +220,7 @@ afterAll(() => server.close());
 
 1. **Lint Check**: ESLint validation
 2. **Type Check**: TypeScript compilation
-3. **Unit Tests**: Jest/Vitest execution  
+3. **Unit Tests**: Jest/Vitest execution
 4. **Integration Tests**: Component testing
 5. **E2E Tests**: Playwright execution
 6. **Coverage Report**: Generate and upload coverage

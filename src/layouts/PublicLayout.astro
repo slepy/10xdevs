@@ -1,0 +1,81 @@
+---
+import BaseLayout from "./BaseLayout.astro";
+import Navigation from "../components/Navigation.astro";
+
+interface Props {
+  title?: string;
+  description?: string;
+  showFooter?: boolean;
+}
+
+const { showFooter = true, ...rest } = Astro.props;
+const user = Astro.locals.user;
+---
+
+<BaseLayout {...rest}>
+  <div class="min-h-screen flex flex-col" data-testid="public-layout">
+    <Navigation user={user} currentPath={Astro.url.pathname} variant="public" />
+
+    <main class="flex-1" data-testid="main-content">
+      <slot />
+    </main>
+
+    {
+      showFooter && (
+        <footer class="bg-gray-900 text-white py-8 mt-auto" data-testid="footer">
+          <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div>
+                <h3 class="text-lg font-bold mb-4">BlindInvest</h3>
+                <p class="text-gray-400">Platforma agregująca oferty inwestycyjne z wielu źródeł.</p>
+              </div>
+              <div>
+                <h3 class="text-lg font-bold mb-4">Linki</h3>
+                <ul class="space-y-2 text-gray-400">
+                  <li>
+                    <a href="/offers" class="hover:text-white transition">
+                      Oferty
+                    </a>
+                  </li>
+                  <li>
+                    <a href="/about" class="hover:text-white transition">
+                      O nas
+                    </a>
+                  </li>
+                  <li>
+                    <a href="/contact" class="hover:text-white transition">
+                      Kontakt
+                    </a>
+                  </li>
+                </ul>
+              </div>
+              <div>
+                <h3 class="text-lg font-bold mb-4">Pomoc</h3>
+                <ul class="space-y-2 text-gray-400">
+                  <li>
+                    <a href="/faq" class="hover:text-white transition">
+                      FAQ
+                    </a>
+                  </li>
+                  <li>
+                    <a href="/terms" class="hover:text-white transition">
+                      Regulamin
+                    </a>
+                  </li>
+                  <li>
+                    <a href="/privacy" class="hover:text-white transition">
+                      Polityka prywatności
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+            <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+              <p>&copy; {new Date().getFullYear()} BlindInvest. Wszelkie prawa zastrzeżone.</p>
+            </div>
+          </div>
+        </footer>
+      )
+    }
+  </div>
+</BaseLayout>

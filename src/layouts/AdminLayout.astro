@@ -1,0 +1,26 @@
+---
+import BaseLayout from "./BaseLayout.astro";
+import Navigation from "../components/Navigation.astro";
+import { requireRole } from "../lib/auth/protection";
+import { USER_ROLES } from "../types";
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+// Require admin role - will redirect to login or unauthorized if not admin
+const user = requireRole(Astro, USER_ROLES.ADMIN);
+
+const { ...rest } = Astro.props;
+---
+
+<BaseLayout {...rest}>
+  <div class="min-h-screen flex flex-col" data-testid="admin-layout">
+    <Navigation user={user} currentPath={Astro.url.pathname} variant="admin" />
+
+    <main class="flex-1 px-8 py-6 bg-gray-100 overflow-auto" data-testid="main-content">
+      <slot />
+    </main>
+  </div>
+</BaseLayout>

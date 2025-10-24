@@ -5,9 +5,10 @@ import type { UserDTO } from "../types";
 interface Props {
   user?: UserDTO | null;
   currentPath?: string;
+  variant?: "public" | "authenticated" | "admin";
 }
 
-const { user, currentPath } = Astro.props;
+const { user, currentPath, variant } = Astro.props;
 ---
 
-<NavigationComponent client:load user={user} currentPath={currentPath} />
+<NavigationComponent client:load user={user} currentPath={currentPath} variant={variant} />

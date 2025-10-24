@@ -1,8 +1,15 @@
 ---
 import Welcome from "../components/Welcome.astro";
-import Layout from "../layouts/Layout.astro";
+import PublicLayout from "../layouts/PublicLayout.astro";
+
+// Redirect logged-in users to offers or admin panel
+const user = Astro.locals.user;
+if (user) {
+  const redirectPath = user.role === "admin" ? "/admin" : "/offers";
+  return Astro.redirect(redirectPath);
+}
 ---
 
-<Layout showNavigation={true}>
+<PublicLayout title="Strona główna | BlindInvest">
   <Welcome />
-</Layout>
+</PublicLayout>

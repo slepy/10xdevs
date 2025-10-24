@@ -1,0 +1,67 @@
+---
+import BaseLayout from "./BaseLayout.astro";
+import Navigation from "../components/Navigation.astro";
+import UserSidebar from "../components/UserSidebar.astro";
+import { requireAuth } from "../lib/auth/protection";
+
+interface Props {
+  title?: string;
+  description?: string;
+  showSidebar?: boolean;
+  breadcrumbs?: Array<{ label: string; href: string }>;
+}
+
+// Require authentication - will redirect to login if not authenticated
+const user = requireAuth(Astro);
+
+const { showSidebar = false, breadcrumbs, ...rest } = Astro.props;
+---
+
+<BaseLayout {...rest}>
+  <div class="min-h-screen flex flex-col bg-gray-50" data-testid="authenticated-layout">
+    <Navigation user={user} currentPath={Astro.url.pathname} variant="authenticated" />
+
+    <div class="flex flex-1">
+      {
+        showSidebar && (
+          <aside class="hidden md:flex md:w-64 md:flex-col bg-white border-r border-gray-200" data-testid="sidebar">
+            <slot name="sidebar">
+              <UserSidebar user={user} currentPath={Astro.url.pathname} />
+            </slot>
+          </aside>
+        )
+      }
+
+      <main class="flex-1 px-4 py-8 md:px-8" data-testid="main-content">
+        {
+          breadcrumbs && breadcrumbs.length > 0 && (
+            <nav class="mb-6" aria-label="Breadcrumb" data-testid="breadcrumbs">
+              <ol class="flex items-center space-x-2 text-sm">
+                {breadcrumbs.map((crumb, index) => (
+                  <>
+                    <li>
+                      {index === breadcrumbs.length - 1 ? (
+                        <span class="text-gray-900 font-medium">{crumb.label}</span>
+                      ) : (
+                        <a href={crumb.href} class="text-blue-600 hover:text-blue-800 hover:underline">
+                          {crumb.label}
+                        </a>
+                      )}
+                    </li>
+                    {index < breadcrumbs.length - 1 && (
+                      <li class="text-gray-400" aria-hidden="true">
+                        /
+                      </li>
+                    )}
+                  </>
+                ))}
+              </ol>
+            </nav>
+          )
+        }
+
+        <slot />
+      </main>
+    </div>
+  </div>
+</BaseLayout>

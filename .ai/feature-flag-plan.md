@@ -30,8 +30,8 @@ src/features/
 ### Type System
 
 ```typescript
-type FeatureName = 'auth' | 'offers-list' | 'offers-create';
-type Environment = 'development' | 'production' | 'test';
+type FeatureName = "auth" | "offers-list" | "offers-create";
+type Environment = "development" | "production" | "test";
 type EnvironmentConfig = Record<Environment, boolean>;
 type FeaturesConfig = Record<FeatureName, EnvironmentConfig>;
 ```
@@ -41,17 +41,17 @@ type FeaturesConfig = Record<FeatureName, EnvironmentConfig>;
 ```typescript
 // config.ts
 const features: FeaturesConfig = {
-  'auth': {
+  auth: {
     development: true,
     production: true,
     test: true,
   },
-  'offers-list': {
+  "offers-list": {
     development: true,
     production: true,
     test: true,
   },
-  'offers-create': {
+  "offers-create": {
     development: true,
     production: false,
     test: true,
@@ -96,14 +96,11 @@ if (!isFeatureEnabled('auth')) {
 **Use cases**: React components, conditional rendering
 
 ```tsx
-import { FeatureFlag } from '@/features';
+import { FeatureFlag } from "@/features";
 
 function App() {
   return (
-    <FeatureFlag
-      feature="auth"
-      fallback={<ComingSoonMessage />}
-    >
+    <FeatureFlag feature="auth" fallback={<ComingSoonMessage />}>
       <LoginForm />
     </FeatureFlag>
   );
@@ -115,9 +112,9 @@ function App() {
 **Use cases**: API routes with automatic feature check
 
 ```typescript
-import { withFeatureFlag } from '@/features';
+import { withFeatureFlag } from "@/features";
 
-export const POST = withFeatureFlag('auth', async ({ request, locals }) => {
+export const POST = withFeatureFlag("auth", async ({ request, locals }) => {
   // Automatically returns 503 if feature is disabled
   // ... implementation
 });
@@ -175,9 +172,9 @@ export const POST = withFeatureFlag('auth', async ({ request, locals }) => {
 function getCurrentEnvironment(): Environment {
   const env = import.meta.env.MODE;
 
-  if (env === 'production') return 'production';
-  if (env === 'test') return 'test';
-  return 'development';
+  if (env === "production") return "production";
+  if (env === "test") return "test";
+  return "development";
 }
 ```
 
@@ -284,11 +281,11 @@ When feature is disabled:
 
 ```typescript
 // Union type prevents typos
-type FeatureName = 'auth' | 'offers-list' | 'offers-create';
+type FeatureName = "auth" | "offers-list" | "offers-create";
 
 // TypeScript will error on invalid feature name
-isFeatureEnabled('authhh'); // ❌ Error
-isFeatureEnabled('auth');   // ✅ OK
+isFeatureEnabled("authhh"); // ❌ Error
+isFeatureEnabled("auth"); // ✅ OK
 ```
 
 ### Config Validation

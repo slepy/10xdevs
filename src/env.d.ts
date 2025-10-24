@@ -9,6 +9,8 @@ declare global {
     interface Locals {
       supabase: SupabaseClient<Database>;
       user?: UserDTO;
+      isAuthenticated: boolean;
+      isAdmin: boolean;
     }
   }
 }

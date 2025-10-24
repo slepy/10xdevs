@@ -46,11 +46,11 @@ projects: [
     testMatch: /global\.teardown\.ts/,
   },
   {
-    name: "chromium", 
+    name: "chromium",
     use: { ...devices["Desktop Chrome"] },
     teardown: "cleanup db",
   },
-]
+];
 ```
 
 ### global.teardown.ts
@@ -99,10 +99,7 @@ npx playwright test --project="cleanup db"
 
 ```typescript
 const testUsers = users.users.filter(
-  (user: User) =>
-    user.email?.includes("test") || 
-    user.email?.includes("playwright") || 
-    user.email?.includes("e2e")
+  (user: User) => user.email?.includes("test") || user.email?.includes("playwright") || user.email?.includes("e2e")
 );
 ```
 
@@ -139,11 +136,8 @@ The cleanup process logs detailed information:
 To clean additional tables, add them to `global.teardown.ts`:
 
 ```typescript
-console.log('🗑️  Deleting test data from new_table...');
-const { error: newTableError } = await supabase
-  .from("new_table")
-  .delete()
-  .neq("id", "");
+console.log("🗑️  Deleting test data from new_table...");
+const { error: newTableError } = await supabase.from("new_table").delete().neq("id", "");
 
 if (newTableError) {
   console.error("❌ Error deleting new_table:", newTableError);
@@ -159,8 +153,5 @@ Instead of deleting all records, you can filter by specific criteria:
 ```typescript
 // Only delete records created in the last hour (test data)
 const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
-const { error } = await supabase
-  .from("offers")
-  .delete()
-  .gte("created_at", oneHourAgo);
+const { error } = await supabase.from("offers").delete().gte("created_at", oneHourAgo);
 ```

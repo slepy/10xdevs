@@ -15,12 +15,64 @@ Wersja MVP aplikacji będzie zawierać następujące funkcjonalności:
 - FU-01: Uwierzytelnianie użytkowników: Możliwość rejestracji i logowania dla użytkowników o roli "Signer". Dostęp dla roli "Admin" jest predefiniowany.
 - FU-02: Zarządzanie użytkownikami: Administrator ma dostęp do listy zarejestrowanych użytkowników.
 - FU-03: Zarządzanie ofertami: Administrator może tworzyć, edytować i zarządzać statusami ofert inwestycyjnych.
-- FU-04: Przeglądanie ofert: Wszyscy użytkownicy (zarówno zalogowani, jak i niezalogowani) mogą przeglądać aktywne oferty inwestycyjne.
+- FU-04: Przeglądanie ofert: Tylko zalogowani użytkownicy mogą przeglądać aktywne oferty inwestycyjne. Niezalogowani użytkownicy są przekierowywani do strony logowania.
 - FU-05: Proces inwestycyjny: Użytkownik "Signer" może złożyć deklarację inwestycyjną na wybraną ofertę.
 - FU-06: Zarządzanie inwestycjami: Administrator zarządza cyklem życia inwestycji (akceptacja, odrzucenie, zamknięcie).
 - FU-07: Zarządzanie dokumentami: Administrator może dodawać dokumenty do zaakceptowanych inwestycji.
 - FU-08: Anulowanie inwestycji: Użytkownik "Signer" może anulować swoją inwestycję, dopóki ma ona status "oczekująca".
 - FU-09: Powiadomienia: Użytkownicy otrzymują powiadomienia o kluczowych zmianach statusu ich inwestycji.
+
+## 3.1. System Nawigacji
+
+Aplikacja posiada zróżnicowany system nawigacji dostosowany do stanu logowania i roli użytkownika:
+
+### Nawigacja dla niezalogowanych użytkowników
+
+Menu główne zawiera:
+
+- **Strona główna** - strona powitalna z informacjami o platformie
+- **O nas** - informacje o firmie i zespole
+- **Zaloguj się** - link do strony logowania
+- **Zarejestruj się** - przycisk call-to-action prowadzący do rejestracji
+
+Niezalogowani użytkownicy próbujący uzyskać dostęp do chronionych zasobów są automatycznie przekierowywani do strony logowania z zachowaniem docelowego URL (parametr `?redirect=`).
+
+### Nawigacja dla zalogowanych użytkowników (Signer)
+
+Menu główne zawiera:
+
+- **Oferty** - przeglądanie dostępnych ofert inwestycyjnych
+- **Moje Inwestycje** - lista wszystkich inwestycji użytkownika
+
+Dodatkowo, każdy zalogowany użytkownik ma dostęp do **rozwijanego menu użytkownika** (w prawym górnym rogu), które zawiera:
+
+- Wyświetlanie informacji użytkownika (imię, nazwisko, email, rola)
+- **Mój profil** - edycja danych osobowych
+- **Wyloguj się** - zakończenie sesji
+
+### Nawigacja dla administratorów (Admin)
+
+Menu główne zawiera:
+
+- **Oferty** - przeglądanie dostępnych ofert inwestycyjnych (widok identyczny jak dla Signer)
+- **Panel Admin** - dostęp do panelu administracyjnego
+
+W panelu administracyjnym dostępne są dodatkowe sekcje w sidebarze:
+
+- **Oferty** - zarządzanie ofertami (CRUD)
+- **Inwestycje** - zarządzanie inwestycjami użytkowników
+- **Użytkownicy** - przeglądanie listy zarejestrowanych użytkowników
+- **Ustawienia** - konfiguracja platformy
+
+Menu użytkownika dla administratora jest identyczne jak dla użytkownika Signer (Mój profil, Wyloguj się).
+
+### Przekierowania automatyczne
+
+- Zalogowani użytkownicy wchodząc na stronę główną (`/`) są automatycznie przekierowywani:
+  - **Signer** → `/offers` (lista ofert)
+  - **Admin** → `/admin` (panel administracyjny)
+- Próba dostępu do stron logowania/rejestracji przez zalogowanych użytkowników skutkuje przekierowaniem do odpowiedniej strony startowej
+- Próba dostępu do zasobów wymagających uprawnień administratora przez użytkowników Signer skutkuje przekierowaniem do strony "Brak uprawnień" (403)
 
 ## 4. Granice produktu
 
@@ -63,7 +115,7 @@ Następujące funkcjonalności nie wchodzą w zakres wersji MVP i mogą zostać 
 - Opis: Jako gość lub zalogowany użytkownik, chcę móc przeglądać listę wszystkich aktywnych ofert inwestycyjnych, aby zorientować się w dostępnych możliwościach.
 - Kryteria akceptacji:
   1. Strona "Preview Offers" jest dostępna dla wszystkich odwiedzających.
-  2. Na liście wyświetlane są kluczowe informacje o każdej ofercie (np. nazwa, krótki opis, kluczowe wskaźniki).
+  2. Na liście wyświetlane są kluczowe informacje o każdej ofercie (np. nazwa, kluczowe wskaźniki).
   3. Użytkownik może kliknąć na ofertę, aby zobaczyć jej szczegóły.
 
 ### Zarządzanie Ofertami (Admin)

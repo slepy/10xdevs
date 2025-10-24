@@ -1,5 +1,5 @@
 ---
-import Layout from "../layouts/Layout.astro";
+import MinimalLayout from "../layouts/MinimalLayout.astro";
 import { RegisterForm } from "../components/forms/RegisterForm";
 import { isFeatureEnabled } from "../features";
 
@@ -10,28 +10,16 @@ if (!isFeatureEnabled("auth")) {
   return Astro.redirect("/");
 }
 
-// Check if user is already logged in
-// TODO: This will be implemented when middleware is ready
-// const user = Astro.locals.user;
-// if (user) {
-//   return Astro.redirect("/offers");
-// }
+// MinimalLayout automatically redirects logged-in users
 ---
 
-<Layout title={title}>
-  <main
-    class="flex-1 flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8"
-    data-testid="register-page"
-  >
-    <div class="max-w-md w-full space-y-8" data-testid="register-container">
-      <div class="text-center" data-testid="register-header">
-        <h1 class="text-3xl font-bold text-gray-900 mb-2" data-testid="register-title">Zarejestruj się</h1>
-        <p class="text-gray-600" data-testid="register-subtitle">Stwórz nowe konto, aby rozpocząć inwestowanie</p>
-      </div>
-
-      <div class="bg-white shadow-md rounded-lg p-8" data-testid="register-form-container">
-        <RegisterForm client:load />
-      </div>
+<MinimalLayout title={title} showBackButton={true}>
+  <div class="bg-white shadow-xl rounded-2xl p-8" data-testid="register-page">
+    <div class="text-center mb-8" data-testid="register-header">
+      <h1 class="text-3xl font-bold text-gray-900 mb-2" data-testid="register-title">Zarejestruj się</h1>
+      <p class="text-gray-600" data-testid="register-subtitle">Stwórz nowe konto, aby rozpocząć inwestowanie</p>
     </div>
-  </main>
-</Layout>
+
+    <RegisterForm client:load />
+  </div>
+</MinimalLayout>
