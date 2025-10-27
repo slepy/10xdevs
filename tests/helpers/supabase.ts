@@ -16,6 +16,7 @@ export function createMockSupabaseClient(overrides?: Partial<SupabaseClient>): S
       onAuthStateChange: vi.fn(),
       admin: {
         getUserById: vi.fn(),
+        listUsers: vi.fn(),
       },
     },
     from: vi.fn(() => ({

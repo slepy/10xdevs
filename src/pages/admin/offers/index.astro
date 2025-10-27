@@ -1,0 +1,33 @@
+---
+import AdminLayout from "../../../layouts/AdminLayout.astro";
+import PageHeader from "../../../components/admin/PageHeader.astro";
+import { OffersService } from "../../../lib/services/offers.service";
+import { BaseButton } from "../../../components/base";
+
+const { supabase } = Astro.locals;
+const offersService = new OffersService(supabase);
+const offers = await offersService.getOffers();
+---
+
+<AdminLayout title="Zarządzaj Ofertami">
+  <PageHeader title="Zarządzaj Ofertami">
+    <a slot="actions" href="/admin/offers/create">
+      <BaseButton>Dodaj nową ofertę</BaseButton>
+    </a>
+  </PageHeader>
+
+  {
+    offers.length === 0 ? (
+      <div class="flex flex-col items-center justify-center text-center p-10 border-2 border-dashed rounded-lg">
+        <p class="text-lg font-semibold text-gray-500">Brak dostępnych ofert.</p>
+        <p class="text-gray-400 mt-2">Dodaj pierwszą, aby rozpocząć.</p>
+      </div>
+    ) : (
+      <ul>
+        {offers.map((offer) => (
+          <li>{offer.name}</li>
+        ))}
+      </ul>
+    )
+  }
+</AdminLayout>

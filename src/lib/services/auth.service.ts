@@ -108,29 +108,6 @@ export class AuthService {
   }
 
   /**
-   * Sprawdza czy użytkownik ma rolę administratora
-   * @param userId ID użytkownika
-   * @returns true jeśli użytkownik jest administratorem
-   */
-  async isAdmin(userId: string): Promise<boolean> {
-    try {
-      const {
-        data: { user },
-        error,
-      } = await this.supabase.auth.admin.getUserById(userId);
-
-      if (error || !user) {
-        return false;
-      }
-
-      const role = user.user_metadata?.role || user.app_metadata?.role;
-      return role === USER_ROLES.ADMIN;
-    } catch {
-      return false;
-    }
-  }
-
-  /**
    * Mapuje dane użytkownika z Supabase Auth do DTO
    * @param user Użytkownik z Supabase Auth
    * @returns UserDTO

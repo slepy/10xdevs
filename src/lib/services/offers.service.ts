@@ -48,6 +48,27 @@ export class OffersService {
   }
 
   /**
+   * Pobiera wszystkie oferty
+   * @returns Lista ofert lub błąd
+   */
+  async getOffers(): Promise<OfferDTO[]> {
+    try {
+      const { data, error } = await this.supabase.from("offers").select("*");
+
+      if (error) {
+        throw new Error(`Błąd podczas pobierania ofert: ${error.message}`);
+      }
+
+      return data || [];
+    } catch (error) {
+      if (error instanceof Error) {
+        throw error;
+      }
+      throw new Error("Nieznany błąd podczas pobierania ofert");
+    }
+  }
+
+  /**
    * Konwertuje kwotę z PLN na centy (grosz)
    * @param amount Kwota w PLN
    * @returns Kwota w groszach

@@ -57,12 +57,13 @@ Menu główne zawiera:
 - **Oferty** - przeglądanie dostępnych ofert inwestycyjnych (widok identyczny jak dla Signer)
 - **Panel Admin** - dostęp do panelu administracyjnego
 
-W panelu administracyjnym dostępne są dodatkowe sekcje w sidebarze:
+Po wejściu do panelu administracyjnego, administrator jest automatycznie przekierowywany do sekcji zarządzania ofertami (`/admin/offers`).
+
+W panelu administracyjnym dostępne jest submenu (sidebar) z następującymi sekcjami:
 
 - **Oferty** - zarządzanie ofertami (CRUD)
 - **Inwestycje** - zarządzanie inwestycjami użytkowników
 - **Użytkownicy** - przeglądanie listy zarejestrowanych użytkowników
-- **Ustawienia** - konfiguracja platformy
 
 Menu użytkownika dla administratora jest identyczne jak dla użytkownika Signer (Mój profil, Wyloguj się).
 

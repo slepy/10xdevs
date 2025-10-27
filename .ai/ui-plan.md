@@ -80,11 +80,11 @@ System interfejsu użytkownika został zaprojektowany jako zestaw spójnych wido
 
 ### 2.7. Panel administratora
 
-- **Ścieżka widoku:** `/admin/dashboard`
+- **Ścieżka widoku:** `/admin`
 
-- **Główny cel:** Kompleksowe zarządzanie użytkownikami, ofertami, inwestycjami i powiadomieniami.
+- **Główny cel:** Kompleksowe zarządzanie użytkownikami, ofertami, inwestycjami.
 
-- **Kluczowe informacje do wyświetlenia:** Oddzielne sekcje/zakładki dla zarządzania użytkownikami, ofertami, inwestycjami oraz powiadomieniami.
+- **Kluczowe informacje do wyświetlenia:** Oddzielne sekcje/zakładki dla zarządzania użytkownikami, ofertami, inwestycjami.
 
 - **Kluczowe komponenty widoku:** Nawigacja typu sidebar lub zakładki, tabele z danymi, formularze do tworzenia/edycji ofert, modale potwierdzające akcje, alerty systemowe.
 

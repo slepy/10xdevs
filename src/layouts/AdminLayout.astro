@@ -12,15 +12,45 @@ interface Props {
 // Require admin role - will redirect to login or unauthorized if not admin
 const user = requireRole(Astro, USER_ROLES.ADMIN);
 
+const menuItems = [
+  { href: "/admin/offers", label: "Oferty" },
+  { href: "/admin/investments", label: "Inwestycje" },
+  { href: "/admin/users", label: "Użytkownicy" },
+];
+
 const { ...rest } = Astro.props;
 ---
 
 <BaseLayout {...rest}>
   <div class="min-h-screen flex flex-col" data-testid="admin-layout">
     <Navigation user={user} currentPath={Astro.url.pathname} variant="admin" />
-
-    <main class="flex-1 px-8 py-6 bg-gray-100 overflow-auto" data-testid="main-content">
-      <slot />
-    </main>
+    <div class="flex flex-1">
+      <aside class="w-64 bg-gray-100 p-4 border-r border-gray-200">
+        <nav>
+          <ul>
+            {
+              menuItems.map((item) => (
+                <li>
+                  <a
+                    href={item.href}
+                    class:list={[
+                      "block py-2 px-4 rounded hover:bg-gray-200",
+                      { "bg-gray-300 font-semibold": Astro.url.pathname.startsWith(item.href) },
+                    ]}
+                  >
+                    {item.label}
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+        </nav>
+      </aside>
+      <main class="flex-1 bg-white overflow-auto" data-testid="main-content">
+        <div class="container mx-auto py-6 px-6">
+          <slot />
+        </div>
+      </main>
+    </div>
   </div>
 </BaseLayout>

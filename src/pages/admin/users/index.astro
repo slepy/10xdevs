@@ -1,0 +1,39 @@
+---
+import AdminLayout from "../../../layouts/AdminLayout.astro";
+import PageHeader from "../../../components/admin/PageHeader.astro";
+import { UsersTable } from "../../../components/admin/UsersTable";
+import { UsersService } from "../../../lib/services/users.service";
+import type { UserDTO } from "../../../types";
+
+export const prerender = false;
+
+// Pobranie danych bezpośrednio z serwisu
+const usersService = new UsersService();
+
+let users: UserDTO[] = [];
+let error: string | null = null;
+
+try {
+  const result = await usersService.listUsers({ page: 1, limit: 100 });
+  users = result.data;
+} catch (err) {
+  // eslint-disable-next-line no-console
+  console.error("Error fetching users:", err);
+  error = err instanceof Error ? err.message : "Wystąpił nieznany błąd podczas pobierania użytkowników";
+}
+---
+
+<AdminLayout title="Użytkownicy">
+  <PageHeader title="Użytkownicy" />
+
+  {
+    error ? (
+      <div class="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded" role="alert">
+        <p class="font-semibold">Błąd</p>
+        <p>{error}</p>
+      </div>
+    ) : (
+      <UsersTable users={users} client:load />
+    )
+  }
+</AdminLayout>
