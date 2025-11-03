@@ -15,10 +15,6 @@ if (!investmentId) {
 
 <AdminLayout title="Szczegóły Inwestycji - Panel Administracyjny">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <InvestmentDetailsView
-      client:load
-      investmentId={investmentId}
-      userRole="admin"
-    />
+    <InvestmentDetailsView client:load investmentId={investmentId} userRole="admin" />
   </div>
 </AdminLayout>

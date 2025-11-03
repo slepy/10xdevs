@@ -103,7 +103,6 @@ export function Navigation({ user, currentPath = "", variant }: NavigationProps)
   // Determine navigation styles based on variant
   const isAdminVariant = detectedVariant === "admin";
   const bgColor = isAdminVariant ? "bg-gray-900" : "bg-white";
-  const textColor = isAdminVariant ? "text-white" : "text-gray-900";
   const borderColor = isAdminVariant ? "border-gray-800" : "border-gray-200";
   const logoHref = user ? (user.role === USER_ROLES.ADMIN ? "/admin" : "/offers") : "/";
 

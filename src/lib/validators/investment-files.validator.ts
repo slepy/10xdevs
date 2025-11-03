@@ -30,7 +30,7 @@ export const uploadFileMetadataSchema = z.object({
     .number()
     .positive("wielkość pliku musi być większa od 0")
     .max(MAX_FILE_SIZE, `wielkość pliku nie może przekraczać ${MAX_FILE_SIZE / 1024 / 1024} mb`),
-  file_type: z.string().refine((type) => ALLOWED_FILE_TYPES.includes(type as any), {
+  file_type: z.string().refine((type) => ALLOWED_FILE_TYPES.includes(type as (typeof ALLOWED_FILE_TYPES)[number]), {
     message: "nieobsługiwany typ pliku",
   }),
 });

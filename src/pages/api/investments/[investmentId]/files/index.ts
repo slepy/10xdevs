@@ -31,12 +31,14 @@ export const GET: APIRoute = async ({ params, locals }) => {
     );
   }
 
+  const { investment_id: validatedInvestmentId } = validation.data;
+
   try {
     const service = new InvestmentFilesService(locals.supabase);
 
     // 3. jeśli signer - sprawdź czy to jego inwestycja
     if (locals.user.role === USER_ROLES.SIGNER) {
-      const isOwner = await service.isInvestmentOwner(investmentId!, locals.user.id);
+      const isOwner = await service.isInvestmentOwner(validatedInvestmentId, locals.user.id);
       if (!isOwner) {
         return new Response(JSON.stringify({ error: "forbidden", message: "brak dostępu do tej inwestycji" }), {
           status: 403,
@@ -45,12 +47,11 @@ export const GET: APIRoute = async ({ params, locals }) => {
     }
 
     // 4. pobierz pliki
-    const files = await service.getInvestmentFiles(investmentId!);
+    const files = await service.getInvestmentFiles(validatedInvestmentId);
 
     const response: InvestmentFilesListResponse = { data: files };
     return new Response(JSON.stringify(response), { status: 200 });
   } catch (error) {
-    console.error("error fetching investment files:", error);
     return new Response(
       JSON.stringify({
         error: "internal server error",
@@ -137,7 +138,6 @@ export const POST: APIRoute = async ({ params, request, locals }) => {
     const response: InvestmentFileUploadResponse = { data: fileRecord };
     return new Response(JSON.stringify(response), { status: 201 });
   } catch (error) {
-    console.error("error uploading file:", error);
     return new Response(
       JSON.stringify({
         error: "internal server error",

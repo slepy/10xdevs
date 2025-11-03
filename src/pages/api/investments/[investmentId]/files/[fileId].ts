@@ -42,17 +42,17 @@ export const DELETE: APIRoute = async ({ params, locals }) => {
     );
   }
 
+  const { investment_id: validatedInvestmentId, file_id: validatedFileId } = validation.data;
+
   try {
     const service = new InvestmentFilesService(locals.supabase);
 
     // 4. usuń plik
-    await service.deleteFile(fileId!, investmentId!);
+    await service.deleteFile(validatedFileId, validatedInvestmentId);
 
     const response: InvestmentFileDeleteResponse = { message: "plik został usunięty" };
     return new Response(JSON.stringify(response), { status: 200 });
   } catch (error) {
-    console.error("error deleting file:", error);
-
     const message = error instanceof Error ? error.message : "nie udało się usunąć pliku";
 
     return new Response(
@@ -94,12 +94,14 @@ export const GET: APIRoute = async ({ params, locals }) => {
     );
   }
 
+  const { investment_id: validatedInvestmentId, file_id: validatedFileId } = validation.data;
+
   try {
     const service = new InvestmentFilesService(locals.supabase);
 
     // 3. jeśli signer - sprawdź czy to jego inwestycja
     if (locals.user.role === USER_ROLES.SIGNER) {
-      const isOwner = await service.isInvestmentOwner(investmentId!, locals.user.id);
+      const isOwner = await service.isInvestmentOwner(validatedInvestmentId, locals.user.id);
       if (!isOwner) {
         return new Response(JSON.stringify({ error: "forbidden", message: "brak dostępu do tego pliku" }), {
           status: 403,
@@ -108,8 +110,8 @@ export const GET: APIRoute = async ({ params, locals }) => {
     }
 
     // 4. pobierz metadane pliku z bazy
-    const files = await service.getInvestmentFiles(investmentId!);
-    const fileRecord = files.find((f) => f.id === fileId);
+    const files = await service.getInvestmentFiles(validatedInvestmentId);
+    const fileRecord = files.find((f) => f.id === validatedFileId);
 
     if (!fileRecord) {
       return new Response(JSON.stringify({ error: "not found", message: "nie znaleziono pliku" }), { status: 404 });
@@ -128,7 +130,6 @@ export const GET: APIRoute = async ({ params, locals }) => {
       },
     });
   } catch (error) {
-    console.error("error downloading file:", error);
     return new Response(
       JSON.stringify({
         error: "internal server error",

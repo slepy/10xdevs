@@ -108,8 +108,8 @@ async function refreshSession(): Promise<boolean> {
     }
 
     return false;
-  } catch (error) {
-    console.error("Failed to refresh session:", error);
+  } catch {
+    // Session refresh failed - will be handled by calling code
     return false;
   }
 }
@@ -189,8 +189,8 @@ function getStoredSession(): StoredSession | null {
 function storeSession(session: StoredSession): void {
   try {
     localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(session));
-  } catch (error) {
-    console.error("Failed to store session:", error);
+  } catch {
+    // Silently fail if localStorage is unavailable
   }
 }
 
@@ -200,8 +200,8 @@ function storeSession(session: StoredSession): void {
 function clearStoredSession(): void {
   try {
     localStorage.removeItem(SESSION_STORAGE_KEY);
-  } catch (error) {
-    console.error("Failed to clear session:", error);
+  } catch {
+    // Silently fail if localStorage is unavailable
   }
 }
 

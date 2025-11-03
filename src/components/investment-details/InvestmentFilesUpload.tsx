@@ -28,7 +28,7 @@ export function InvestmentFilesUpload({ investmentId, onUploadSuccess }: Investm
       return;
     }
 
-    if (!ALLOWED_FILE_TYPES.includes(file.type as any)) {
+    if (!ALLOWED_FILE_TYPES.includes(file.type as (typeof ALLOWED_FILE_TYPES)[number])) {
       setError("nieobsługiwany typ pliku");
       return;
     }
@@ -67,7 +67,6 @@ export function InvestmentFilesUpload({ investmentId, onUploadSuccess }: Investm
       // ukryj komunikat po 3 sekundach
       setTimeout(() => setSuccess(null), 3000);
     } catch (err) {
-      console.error("upload error:", err);
       setError(err instanceof Error ? err.message : "nie udało się uploadować pliku");
     } finally {
       setIsUploading(false);

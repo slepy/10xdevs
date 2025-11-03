@@ -49,7 +49,6 @@ describe("getInvestmentStatusBadge", () => {
   });
 
   it("should return fallback config for unknown status", () => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const unknownStatus = "unknown_status" as any;
     const config = getInvestmentStatusBadge(unknownStatus);
 

@@ -18,8 +18,7 @@ export function UserInfoCard({ user }: UserInfoCardProps) {
       })
     : null;
 
-  const fullName =
-    user.firstName && user.lastName ? `${user.firstName} ${user.lastName}` : "Brak danych";
+  const fullName = user.firstName && user.lastName ? `${user.firstName} ${user.lastName}` : "Brak danych";
 
   return (
     <Card>

@@ -16,10 +16,6 @@ if (!investmentId) {
 
 <AuthenticatedLayout title="Szczegóły Inwestycji - BlindInvest">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <InvestmentDetailsView
-      client:load
-      investmentId={investmentId}
-      userRole="signer"
-    />
+    <InvestmentDetailsView client:load investmentId={investmentId} userRole="signer" />
   </div>
 </AuthenticatedLayout>

@@ -80,15 +80,28 @@ export function ConfirmationModal({
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
-      onClick={onCancel}
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="modal-title"
-      aria-describedby="modal-description"
+      role="button"
+      aria-label="Close dialog"
+      tabIndex={0}
+      onClick={(e) => {
+        // Only close when clicking the overlay itself, not child elements
+        if (e.target === e.currentTarget) {
+          onCancel();
+        }
+      }}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          onCancel();
+        }
+      }}
     >
       <div
         className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full mx-4 p-6"
-        onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modal-title"
+        aria-describedby="modal-description"
+        tabIndex={-1}
       >
         <div className="mb-4">
           <h2 id="modal-title" className="text-xl font-semibold text-gray-900 dark:text-gray-100">

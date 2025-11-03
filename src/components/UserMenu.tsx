@@ -43,8 +43,8 @@ export default function UserMenu({ user, isDark = false }: UserMenuProps) {
       } else {
         throw new Error("Logout failed");
       }
-    } catch (error) {
-      console.error("Logout error:", error);
+    } catch {
+      // Handle logout error by showing user-friendly message
       alert("Wystąpił błąd podczas wylogowywania. Spróbuj ponownie.");
       setIsLoggingOut(false);
     }

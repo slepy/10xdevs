@@ -67,7 +67,6 @@ describe("Feature Flags - Environment Detection", () => {
   });
 
   it("should default to development when MODE is undefined", () => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     import.meta.env.MODE = undefined as any;
     expect(getCurrentEnvironment()).toBe("development");
   });
@@ -179,7 +178,7 @@ describe("Feature Flags - Fallback Behavior", () => {
 
     // Use dynamic import and vi.mock instead of require
     const configModule = await import("./config");
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
     vi.spyOn(configModule, "features", "get").mockReturnValue(mockFeatures as any);
 
     const result = isFeatureEnabled("auth");
