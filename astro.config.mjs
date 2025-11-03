@@ -23,7 +23,12 @@ export default defineConfig({
     schema: {
       SUPABASE_URL: envField.string({ context: "server", access: "secret" }),
       SUPABASE_KEY: envField.string({ context: "server", access: "secret" }),
+      SUPABASE_SERVICE_ROLE_KEY: envField.string({
+        context: "server",
+        access: "secret",
+        optional: true,
+      }),
     },
-    validateSecrets: true,
+    validateSecrets: false,
   },
 });
