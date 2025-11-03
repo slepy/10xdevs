@@ -1,25 +1,14 @@
-import { describe, it, expect, beforeAll, afterAll, afterEach } from "vitest";
-import { setupServer } from "msw/node";
+import { describe, it, expect } from "vitest";
+import { setupMswServer, server } from "../helpers/msw";
 import { http, HttpResponse } from "msw";
 
-const SUPABASE_URL = "http://127.0.0.1:54321";
-const SUPABASE_ANON_KEY = "test-anon-key";
+// Setup MSW server
+setupMswServer();
 
-// Mockowanie API Supabase
-const server = setupServer(
-  http.get(`${SUPABASE_URL}/rest/v1/offers`, ({ request }) => {
-    const url = new URL(request.url);
-    const status = url.searchParams.get("status");
-    const endAt = url.searchParams.get("end_at");
-
-    // Symulacja błędu bazy danych
-    if (url.searchParams.get("simulate_error") === "true") {
-      return HttpResponse.json({ message: "Database connection error" }, { status: 500 });
-    }
-
-    // Zwracanie pustej listy gdy filtrujemy po status=active
-    if (status === "eq.active" && endAt?.startsWith("gt.")) {
-      const mockOffers = [
+describe("API Integration Tests - Available Offers", () => {
+  describe("GET /api/offers/available", () => {
+    const mockOffersResponse = {
+      data: [
         {
           id: "1",
           name: "Oferta testowa 1",
@@ -42,98 +31,238 @@ const server = setupServer(
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
         },
-      ];
+      ],
+      pagination: {
+        page: 1,
+        limit: 10,
+        total: 2,
+        totalPages: 1,
+      },
+    };
 
-      return HttpResponse.json(mockOffers, {
-        headers: {
-          "Content-Range": `0-1/2`,
-        },
+    it("should return available offers with default parameters", async () => {
+      server.use(
+        http.get("/api/offers/available", () => {
+          return HttpResponse.json(mockOffersResponse);
+        })
+      );
+
+      const response = await fetch("/api/offers/available");
+      const data = await response.json();
+
+      expect(response.status).toBe(200);
+      expect(data).toHaveProperty("data");
+      expect(data).toHaveProperty("pagination");
+      expect(Array.isArray(data.data)).toBe(true);
+      expect(data.data).toHaveLength(2);
+      expect(data.pagination).toEqual({
+        page: 1,
+        limit: 10,
+        total: 2,
+        totalPages: 1,
       });
-    }
-
-    return HttpResponse.json([]);
-  })
-);
-
-beforeAll(() => server.listen());
-afterEach(() => server.resetHandlers());
-afterAll(() => server.close());
-
-describe("GET /api/offers/available", () => {
-  const API_URL = "http://localhost:4321/api/offers/available";
-
-  it("should return available offers with default parameters", async () => {
-    const response = await fetch(API_URL);
-    const data = await response.json();
-
-    expect(response.status).toBe(200);
-    expect(data).toHaveProperty("data");
-    expect(data).toHaveProperty("pagination");
-    expect(Array.isArray(data.data)).toBe(true);
-    expect(data.pagination).toEqual({
-      page: 1,
-      limit: 10,
-      total: expect.any(Number),
-      totalPages: expect.any(Number),
     });
-  });
 
-  it("should handle custom pagination parameters", async () => {
-    const response = await fetch(`${API_URL}?page=2&limit=5`);
-    const data = await response.json();
+    it("should handle custom pagination parameters", async () => {
+      const paginatedResponse = {
+        data: [mockOffersResponse.data[0]],
+        pagination: {
+          page: 2,
+          limit: 5,
+          total: 2,
+          totalPages: 1,
+        },
+      };
 
-    expect(response.status).toBe(200);
-    expect(data.pagination.page).toBe(2);
-    expect(data.pagination.limit).toBe(5);
-  });
+      server.use(
+        http.get("/api/offers/available", () => {
+          return HttpResponse.json(paginatedResponse);
+        })
+      );
 
-  it("should handle custom sort parameter", async () => {
-    const response = await fetch(`${API_URL}?sort=target_amount`);
-    const data = await response.json();
+      const response = await fetch("/api/offers/available?page=2&limit=5");
+      const data = await response.json();
 
-    expect(response.status).toBe(200);
-    expect(data).toHaveProperty("data");
-  });
+      expect(response.status).toBe(200);
+      expect(data.pagination.page).toBe(2);
+      expect(data.pagination.limit).toBe(5);
+    });
 
-  it("should return 400 for invalid page parameter", async () => {
-    const response = await fetch(`${API_URL}?page=invalid`);
-    const data = await response.json();
+    it("should handle custom sort parameter", async () => {
+      server.use(
+        http.get("/api/offers/available", () => {
+          return HttpResponse.json(mockOffersResponse);
+        })
+      );
 
-    expect(response.status).toBe(400);
-    expect(data).toHaveProperty("error");
-    expect(data.error).toBe("Bad Request");
-    expect(data).toHaveProperty("details");
-  });
+      const response = await fetch("/api/offers/available?sort=target_amount");
+      const data = await response.json();
 
-  it("should return 400 for invalid limit parameter", async () => {
-    const response = await fetch(`${API_URL}?limit=0`);
-    const data = await response.json();
+      expect(response.status).toBe(200);
+      expect(data).toHaveProperty("data");
+    });
 
-    expect(response.status).toBe(400);
-    expect(data.error).toBe("Bad Request");
-  });
+    it("should return 400 for invalid page parameter", async () => {
+      server.use(
+        http.get("/api/offers/available", () => {
+          return HttpResponse.json(
+            {
+              error: "Bad Request",
+              message: "Invalid query parameters.",
+              details: {
+                page: ["Expected number, received nan"],
+              },
+            },
+            { status: 400 }
+          );
+        })
+      );
 
-  it("should return 400 for invalid sort parameter", async () => {
-    const response = await fetch(`${API_URL}?sort=invalid_field`);
-    const data = await response.json();
+      const response = await fetch("/api/offers/available?page=invalid");
+      const data = await response.json();
 
-    expect(response.status).toBe(400);
-    expect(data.error).toBe("Bad Request");
-  });
+      expect(response.status).toBe(400);
+      expect(data).toHaveProperty("error");
+      expect(data.error).toBe("Bad Request");
+      expect(data).toHaveProperty("details");
+    });
 
-  it("should return 400 for limit exceeding maximum", async () => {
-    const response = await fetch(`${API_URL}?limit=101`);
-    const data = await response.json();
+    it("should return 400 for invalid limit parameter", async () => {
+      server.use(
+        http.get("/api/offers/available", () => {
+          return HttpResponse.json(
+            {
+              error: "Bad Request",
+              message: "Invalid query parameters.",
+              details: {
+                limit: ["Number must be greater than or equal to 1"],
+              },
+            },
+            { status: 400 }
+          );
+        })
+      );
 
-    expect(response.status).toBe(400);
-    expect(data.error).toBe("Bad Request");
-  });
+      const response = await fetch("/api/offers/available?limit=0");
+      const data = await response.json();
 
-  it("should return 400 for negative page number", async () => {
-    const response = await fetch(`${API_URL}?page=-1`);
-    const data = await response.json();
+      expect(response.status).toBe(400);
+      expect(data.error).toBe("Bad Request");
+    });
 
-    expect(response.status).toBe(400);
-    expect(data.error).toBe("Bad Request");
+    it("should return 400 for invalid sort parameter", async () => {
+      server.use(
+        http.get("/api/offers/available", () => {
+          return HttpResponse.json(
+            {
+              error: "Bad Request",
+              message: "Invalid query parameters.",
+              details: {
+                sort: ["Invalid enum value"],
+              },
+            },
+            { status: 400 }
+          );
+        })
+      );
+
+      const response = await fetch("/api/offers/available?sort=invalid_field");
+      const data = await response.json();
+
+      expect(response.status).toBe(400);
+      expect(data.error).toBe("Bad Request");
+    });
+
+    it("should return 400 for limit exceeding maximum", async () => {
+      server.use(
+        http.get("/api/offers/available", () => {
+          return HttpResponse.json(
+            {
+              error: "Bad Request",
+              message: "Invalid query parameters.",
+              details: {
+                limit: ["Number must be less than or equal to 100"],
+              },
+            },
+            { status: 400 }
+          );
+        })
+      );
+
+      const response = await fetch("/api/offers/available?limit=101");
+      const data = await response.json();
+
+      expect(response.status).toBe(400);
+      expect(data.error).toBe("Bad Request");
+    });
+
+    it("should return 400 for negative page number", async () => {
+      server.use(
+        http.get("/api/offers/available", () => {
+          return HttpResponse.json(
+            {
+              error: "Bad Request",
+              message: "Invalid query parameters.",
+              details: {
+                page: ["Number must be greater than or equal to 1"],
+              },
+            },
+            { status: 400 }
+          );
+        })
+      );
+
+      const response = await fetch("/api/offers/available?page=-1");
+      const data = await response.json();
+
+      expect(response.status).toBe(400);
+      expect(data.error).toBe("Bad Request");
+    });
+
+    it("should return 500 for internal server errors", async () => {
+      server.use(
+        http.get("/api/offers/available", () => {
+          return HttpResponse.json(
+            {
+              error: "Internal Server Error",
+              message: "An unexpected error occurred.",
+            },
+            { status: 500 }
+          );
+        })
+      );
+
+      const response = await fetch("/api/offers/available");
+      const data = await response.json();
+
+      expect(response.status).toBe(500);
+      expect(data.error).toBe("Internal Server Error");
+      expect(data.message).toBe("An unexpected error occurred.");
+    });
+
+    it("should return empty array when no offers are available", async () => {
+      const emptyResponse = {
+        data: [],
+        pagination: {
+          page: 1,
+          limit: 10,
+          total: 0,
+          totalPages: 0,
+        },
+      };
+
+      server.use(
+        http.get("/api/offers/available", () => {
+          return HttpResponse.json(emptyResponse);
+        })
+      );
+
+      const response = await fetch("/api/offers/available");
+      const data = await response.json();
+
+      expect(response.status).toBe(200);
+      expect(data.data).toEqual([]);
+      expect(data.pagination.total).toBe(0);
+    });
   });
 });

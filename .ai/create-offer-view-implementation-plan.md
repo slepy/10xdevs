@@ -48,7 +48,7 @@ Widok będzie zaimplementowany jako strona Astro, która renderuje komponent Rea
     - Zmianę kolejności obrazów (drag & drop między miniaturami).
     - Walidację formatu plików (jpg, jpeg, png, webp) i rozmiaru (max 5MB każdy).
     - Limit maksymalnie 5 obrazów na ofertę.
-    - Upload do Supabase Storage (bucket: `offer-images`) z progress barem dla każdego obrazu.
+    - Upload do Supabase Storage (bucket: `offer_images`) z progress barem dla każdego obrazu.
     - Wskaźnik postępu całkowitego uploadu wszystkich obrazów.
   - Przycisk `<Button type="submit">` do wysłania formularza, który wyświetla `<Spinner>` w trakcie ładowania.
 - **Obsługiwane interakcje:**
@@ -209,7 +209,7 @@ Integracja z API `POST /api/offers` nastąpi wewnątrz funkcji `onSubmit` przeka
    - Stwórz komponent `MultiImageUpload` dla pola `images` z integracją Supabase Storage:
      - Obsługa drag & drop wielu plików jednocześnie i wyboru wielu plików z dysku.
      - Walidacja typu i rozmiaru każdego pliku oraz limitu 5 obrazów.
-     - Upload każdego obrazu do bucket `offer-images` w Supabase Storage z osobnym progress barem.
+     - Upload każdego obrazu do bucket `offer_images` w Supabase Storage z osobnym progress barem.
      - Galeria miniatur z podglądem wszystkich uploadowanych obrazów.
      - Możliwość zmiany kolejności obrazów (drag & drop między miniaturami).
      - Możliwość usunięcia pojedynczych obrazów z automatycznym usunięciem z Storage.
@@ -217,7 +217,7 @@ Integracja z API `POST /api/offers` nastąpi wewnątrz funkcji `onSubmit` przeka
      - Zarządzanie stanem uploadu dla każdego obrazu i ogólnym stanem (loading, error, success).
 
 4. **Konfiguracja Supabase Storage**:
-   - Utwórz bucket `offer-images` w Supabase Storage z odpowiednimi politykami dostępu:
+   - Utwórz bucket `offer_images` w Supabase Storage z odpowiednimi politykami dostępu:
      - Administratorzy mogą uploadować i usuwać pliki.
      - Publiczny dostęp do odczytu plików.
    - Dodaj helpery do zarządzania uploadem i usuwaniem wielu obrazów w `src/lib/services/storage.service.ts`:

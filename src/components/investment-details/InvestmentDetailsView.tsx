@@ -8,6 +8,7 @@ import { OfferInfoCard } from "./OfferInfoCard";
 import { UserInfoCard } from "./UserInfoCard";
 import { ConfirmationModal } from "./ConfirmationModal";
 import { BaseAlert } from "@/components/base/BaseAlert";
+import { InvestmentFilesCard } from "./InvestmentFilesCard";
 
 interface InvestmentDetailsViewProps {
   investmentId: string;
@@ -21,7 +22,7 @@ function mapToViewModel(dto: InvestmentDetailsDTO, userRole: UserRole): Investme
   return {
     id: dto.id,
     amount: dto.amount,
-    status: dto.status,
+    status: dto.status as InvestmentStatus,
     created_at: dto.created_at,
     completed_at: dto.completed_at,
     reason: dto.reason,
@@ -38,12 +39,13 @@ export function InvestmentDetailsView({ investmentId, userRole }: InvestmentDeta
   const { data, isLoading, isError, error, refetch } = useInvestmentDetails(investmentId);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [actionToConfirm, setActionToConfirm] = useState<{
-    type: "cancel" | "accept" | "reject";
+    type: "cancel" | "accept" | "reject" | "complete";
     payload?: InvestmentStatus;
   } | null>(null);
   const [isActionLoading, setIsActionLoading] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
   const [actionSuccess, setActionSuccess] = useState<string | null>(null);
+  const [filesRefreshTrigger, setFilesRefreshTrigger] = useState(0);
 
   // Obsługa otwarcia modala dla anulowania
   const handleCancelClick = () => {
@@ -53,15 +55,25 @@ export function InvestmentDetailsView({ investmentId, userRole }: InvestmentDeta
 
   // Obsługa otwarcia modala dla zmiany statusu
   const handleStatusChangeClick = (newStatus: InvestmentStatus) => {
+    let type: "accept" | "reject" | "complete";
+
+    if (newStatus === "accepted") {
+      type = "accept";
+    } else if (newStatus === "completed") {
+      type = "complete";
+    } else {
+      type = "reject";
+    }
+
     setActionToConfirm({
-      type: newStatus === "accepted" ? "accept" : "reject",
+      type,
       payload: newStatus,
     });
     setIsModalOpen(true);
   };
 
   // Potwierdzenie akcji w modalu
-  const handleConfirmAction = async () => {
+  const handleConfirmAction = async (reason?: string) => {
     if (!actionToConfirm) return;
 
     setIsActionLoading(true);
@@ -69,15 +81,45 @@ export function InvestmentDetailsView({ investmentId, userRole }: InvestmentDeta
     setActionSuccess(null);
 
     try {
-      // TODO: Wywołanie API dla anulowania/zmiany statusu
-      // Obecnie tylko symulacja - endpointy PUT będą dodane później
-      console.log("Executing action:", actionToConfirm);
+      let response: Response;
 
-      // Symulacja opóźnienia API
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      if (actionToConfirm.type === "cancel") {
+        // Anulowanie przez użytkownika (signer)
+        response = await fetch(`/api/investments/${investmentId}/cancel`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ reason }),
+        });
+      } else {
+        // Akceptacja, odrzucenie lub zakończenie przez admina
+        const payload: { status: string; reason?: string } = {
+          status: actionToConfirm.payload || "accepted",
+        };
+
+        // Dodaj reason tylko dla odrzucenia
+        if (actionToConfirm.payload === "rejected" && reason) {
+          payload.reason = reason;
+        }
+
+        response = await fetch(`/api/investments/${investmentId}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        });
+      }
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.message || "Wystąpił błąd podczas wykonywania operacji");
+      }
 
       // Po sukcesie: odśwież dane i pokaż komunikat
-      refetch();
+      await refetch();
       setIsModalOpen(false);
       setActionToConfirm(null);
 
@@ -85,13 +127,13 @@ export function InvestmentDetailsView({ investmentId, userRole }: InvestmentDeta
         cancel: "Inwestycja została anulowana",
         accept: "Inwestycja została zaakceptowana",
         reject: "Inwestycja została odrzucona",
+        complete: "Inwestycja została zakończona",
       };
       setActionSuccess(successMessages[actionToConfirm.type]);
 
       // Automatyczne ukrycie komunikatu po 5 sekundach
       setTimeout(() => setActionSuccess(null), 5000);
     } catch (err) {
-      console.error("Action failed:", err);
       setActionError(err instanceof Error ? err.message : "Wystąpił błąd podczas wykonywania operacji");
     } finally {
       setIsActionLoading(false);
@@ -104,25 +146,43 @@ export function InvestmentDetailsView({ investmentId, userRole }: InvestmentDeta
     setActionToConfirm(null);
   };
 
-  // Generowanie tytułu i opisu modala
+  // Generowanie tytułu, opisu i konfiguracji modala
   const getModalContent = () => {
-    if (!actionToConfirm) return { title: "", description: "" };
+    if (!actionToConfirm)
+      return { title: "", description: "", requiresReason: false, reasonLabel: "", reasonPlaceholder: "" };
 
     switch (actionToConfirm.type) {
       case "cancel":
         return {
           title: "Anuluj inwestycję",
           description: "Czy na pewno chcesz anulować tę inwestycję? Ta operacja jest nieodwracalna.",
+          requiresReason: true,
+          reasonLabel: "Powód anulowania",
+          reasonPlaceholder: "Wprowadź powód anulowania inwestycji...",
         };
       case "accept":
         return {
           title: "Akceptuj inwestycję",
           description: "Czy na pewno chcesz zaakceptować tę inwestycję?",
+          requiresReason: false,
+          reasonLabel: "",
+          reasonPlaceholder: "",
         };
       case "reject":
         return {
           title: "Odrzuć inwestycję",
           description: "Czy na pewno chcesz odrzucić tę inwestycję? Ta operacja jest nieodwracalna.",
+          requiresReason: true,
+          reasonLabel: "Powód odrzucenia",
+          reasonPlaceholder: "Wprowadź powód odrzucenia inwestycji...",
+        };
+      case "complete":
+        return {
+          title: "Zakończ inwestycję",
+          description: "Czy na pewno chcesz zakończyć tę inwestycję?",
+          requiresReason: false,
+          reasonLabel: "",
+          reasonPlaceholder: "",
         };
     }
   };
@@ -162,6 +222,16 @@ export function InvestmentDetailsView({ investmentId, userRole }: InvestmentDeta
   const investment = mapToViewModel(data, userRole);
   const modalContent = getModalContent();
 
+  // Handler dla odświeżenia listy plików po uploadu
+  const handleUploadSuccess = () => {
+    setFilesRefreshTrigger((prev) => prev + 1);
+  };
+
+  // Sprawdź czy inwestycja jest zaakceptowana lub zakończona (wtedy można przeglądać pliki)
+  const isAccepted = investment.status === "accepted";
+  const isCompleted = investment.status === "completed";
+  const canViewFiles = isAccepted || isCompleted;
+
   return (
     <div className="space-y-6">
       {/* Nagłówek z tytułem i statusem */}
@@ -197,6 +267,15 @@ export function InvestmentDetailsView({ investmentId, userRole }: InvestmentDeta
       {/* Karty z informacjami */}
       <div className="grid grid-cols-1 gap-6">
         <InvestmentInfoCard investment={investment} />
+        {canViewFiles && (
+          <InvestmentFilesCard
+            investmentId={investmentId}
+            userRole={userRole}
+            investmentStatus={investment.status}
+            refreshTrigger={filesRefreshTrigger}
+            onUploadSuccess={handleUploadSuccess}
+          />
+        )}
         <OfferInfoCard offer={investment.offer} />
         {userRole === "admin" && investment.user && <UserInfoCard user={investment.user} />}
       </div>
@@ -208,6 +287,9 @@ export function InvestmentDetailsView({ investmentId, userRole }: InvestmentDeta
         description={modalContent.description}
         onConfirm={handleConfirmAction}
         onCancel={handleCancelAction}
+        requiresReason={modalContent.requiresReason}
+        reasonLabel={modalContent.reasonLabel}
+        reasonPlaceholder={modalContent.reasonPlaceholder}
       />
     </div>
   );

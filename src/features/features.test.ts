@@ -19,10 +19,11 @@ describe("Feature Flags - Configuration", () => {
     expect(features.auth).toBeDefined();
     expect(features["offers-list"]).toBeDefined();
     expect(features["offers-create"]).toBeDefined();
+    expect(features["offer-details"]).toBeDefined();
   });
 
   it("should have all environments for each feature", () => {
-    const featureNames: FeatureName[] = ["auth", "offers-list", "offers-create"];
+    const featureNames: FeatureName[] = ["auth", "offers-list", "offers-create", "offer-details"];
 
     featureNames.forEach((feature) => {
       expect(features[feature].development).toBeDefined();
@@ -32,7 +33,7 @@ describe("Feature Flags - Configuration", () => {
   });
 
   it("should have boolean values for all environment configs", () => {
-    const featureNames: FeatureName[] = ["auth", "offers-list", "offers-create"];
+    const featureNames: FeatureName[] = ["auth", "offers-list", "offers-create", "offer-details"];
 
     featureNames.forEach((feature) => {
       expect(typeof features[feature].development).toBe("boolean");
@@ -104,6 +105,7 @@ describe("Feature Flags - Core Logic", () => {
     expect(isFeatureEnabled("auth")).toBe(true);
     expect(isFeatureEnabled("offers-list")).toBe(true);
     expect(isFeatureEnabled("offers-create")).toBe(true);
+    expect(isFeatureEnabled("offer-details")).toBe(true);
   });
 
   it("should return correct values for all features in production environment", () => {
@@ -111,7 +113,8 @@ describe("Feature Flags - Core Logic", () => {
 
     expect(isFeatureEnabled("auth")).toBe(true);
     expect(isFeatureEnabled("offers-list")).toBe(true);
-    expect(isFeatureEnabled("offers-create")).toBe(true); // Disabled in production
+    expect(isFeatureEnabled("offers-create")).toBe(true);
+    expect(isFeatureEnabled("offer-details")).toBe(true);
   });
 
   it("should return correct values for all features in development environment", () => {
@@ -120,6 +123,7 @@ describe("Feature Flags - Core Logic", () => {
     expect(isFeatureEnabled("auth")).toBe(true);
     expect(isFeatureEnabled("offers-list")).toBe(true);
     expect(isFeatureEnabled("offers-create")).toBe(true);
+    expect(isFeatureEnabled("offer-details")).toBe(true);
   });
 });
 
@@ -190,7 +194,7 @@ describe("Feature Flags - Fallback Behavior", () => {
 describe("Feature Flags - Type Safety", () => {
   it("should only accept valid feature names", () => {
     // These should compile without errors
-    const validFeatures: FeatureName[] = ["auth", "offers-list", "offers-create"];
+    const validFeatures: FeatureName[] = ["auth", "offers-list", "offers-create", "offer-details"];
 
     validFeatures.forEach((feature) => {
       expect(() => isFeatureEnabled(feature)).not.toThrow();
@@ -199,7 +203,7 @@ describe("Feature Flags - Type Safety", () => {
 
   it("should have consistent feature names in config and type", () => {
     const configFeatures = Object.keys(features);
-    const expectedFeatures = ["auth", "offers-list", "offers-create"];
+    const expectedFeatures = ["auth", "offers-list", "offers-create", "offer-details"];
 
     expect(configFeatures.sort()).toEqual(expectedFeatures.sort());
   });

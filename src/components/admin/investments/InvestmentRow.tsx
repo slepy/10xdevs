@@ -1,15 +1,13 @@
 import type { AdminInvestmentViewModel } from "./AdminInvestmentsView";
 import { TableCell, TableRow } from "../../ui/table";
-import { Badge } from "../../ui/badge";
+import { InvestmentStatusBadge } from "@/components/investment-details/InvestmentStatusBadge";
 import { InvestmentActions } from "./InvestmentActions";
-import { getInvestmentStatusBadge } from "@/lib/investment-status";
 
 export interface InvestmentRowProps {
   investment: AdminInvestmentViewModel;
 }
 
 export function InvestmentRow({ investment }: InvestmentRowProps) {
-  const statusConfig = getInvestmentStatusBadge(investment.status);
   return (
     <TableRow>
       <TableCell className="font-medium">{investment.offerName}</TableCell>
@@ -17,7 +15,7 @@ export function InvestmentRow({ investment }: InvestmentRowProps) {
       <TableCell>{investment.userEmail}</TableCell>
       <TableCell>{investment.amount}</TableCell>
       <TableCell>
-        <Badge variant={statusConfig.variant}>{statusConfig.label}</Badge>
+        <InvestmentStatusBadge status={investment.status} />
       </TableCell>
       <TableCell>{investment.submissionDate}</TableCell>
       <TableCell className="text-right">

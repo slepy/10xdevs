@@ -90,7 +90,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     });
 
     // Upload to Supabase Storage
-    const { data, error } = await supabase.storage.from("offer-images").upload(fileName, buffer, {
+    const { data, error } = await supabase.storage.from("offer_images").upload(fileName, buffer, {
       contentType: file.type,
       upsert: false,
     });
@@ -102,7 +102,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       // Provide more specific error messages
       let errorMessage = "Błąd podczas uploadu obrazu";
       if (error.message.includes("Bucket not found")) {
-        errorMessage = "Bucket 'offer-images' nie istnieje. Skonfiguruj Supabase Storage.";
+        errorMessage = "Bucket 'offer_images' nie istnieje. Skonfiguruj Supabase Storage.";
       } else if (error.message.includes("not allowed")) {
         errorMessage = "Brak uprawnień do uploadu. Sprawdź polityki RLS.";
       } else if (error.message) {
@@ -118,7 +118,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     // Get public URL
     const {
       data: { publicUrl },
-    } = supabase.storage.from("offer-images").getPublicUrl(data.path);
+    } = supabase.storage.from("offer_images").getPublicUrl(data.path);
 
     return new Response(
       JSON.stringify({
@@ -181,8 +181,8 @@ export const DELETE: APIRoute = async ({ request, cookies }) => {
     }
 
     // Extract file path from URL
-    // URL format: https://[project-id].supabase.co/storage/v1/object/public/offer-images/[file-path]
-    const urlParts = url.split("/offer-images/");
+    // URL format: https://[project-id].supabase.co/storage/v1/object/public/offer_images/[file-path]
+    const urlParts = url.split("/offer_images/");
     if (urlParts.length < 2) {
       return new Response(JSON.stringify({ error: "Bad Request", message: "Nieprawidłowy URL obrazu" }), {
         status: 400,
@@ -193,7 +193,7 @@ export const DELETE: APIRoute = async ({ request, cookies }) => {
     const filePath = urlParts[1];
 
     // Delete from Supabase Storage
-    const { error } = await supabase.storage.from("offer-images").remove([filePath]);
+    const { error } = await supabase.storage.from("offer_images").remove([filePath]);
 
     if (error) {
       // eslint-disable-next-line no-console

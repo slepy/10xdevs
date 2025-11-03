@@ -38,8 +38,8 @@ Endpoint służy do tworzenia nowych ofert inwestycyjnych w systemie. Jest dost�
   "minimum_investment": 1000,
   "end_at": "2025-12-31T23:59:59Z",
   "images": [
-    "https://example.supabase.co/storage/v1/object/public/offer-images/uuid-1.jpg",
-    "https://example.supabase.co/storage/v1/object/public/offer-images/uuid-2.jpg"
+    "https://example.supabase.co/storage/v1/object/public/offer_images/uuid-1.jpg",
+    "https://example.supabase.co/storage/v1/object/public/offer_images/uuid-2.jpg"
   ]
 }
 ```
@@ -80,8 +80,8 @@ const createOfferSchema = z.object({
     "end_at": "2025-12-31T23:59:59.000Z",
     "status": "draft",
     "images": [
-      "https://example.supabase.co/storage/v1/object/public/offer-images/uuid-1.jpg",
-      "https://example.supabase.co/storage/v1/object/public/offer-images/uuid-2.jpg"
+      "https://example.supabase.co/storage/v1/object/public/offer_images/uuid-1.jpg",
+      "https://example.supabase.co/storage/v1/object/public/offer_images/uuid-2.jpg"
     ],
     "created_at": "2025-10-09T12:00:00.000Z",
     "updated_at": "2025-10-09T12:00:00.000Z"

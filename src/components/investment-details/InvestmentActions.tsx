@@ -1,6 +1,8 @@
 import { CancelInvestmentButton } from "./CancelInvestmentButton";
 import { UpdateInvestmentStatusButtons } from "./UpdateInvestmentStatusButtons";
+import { CompleteInvestmentButton } from "./CompleteInvestmentButton";
 import type { InvestmentDetailsViewModel, InvestmentStatus, UserRole } from "@/types";
+import { INVESTMENT_STATUSES, USER_ROLES } from "@/types";
 
 interface InvestmentActionsProps {
   investment: InvestmentDetailsViewModel;
@@ -21,13 +23,16 @@ export function InvestmentActions({
   isLoading = false,
 }: InvestmentActionsProps) {
   // Przycisk anulowania dla Signera - tylko gdy status to 'pending'
-  const showCancelButton = userRole === "signer" && investment.status === "pending";
+  const showCancelButton = userRole === USER_ROLES.SIGNER && investment.status === INVESTMENT_STATUSES.PENDING;
 
   // Przyciski zmiany statusu dla Admina - tylko gdy status to 'pending'
-  const showStatusButtons = userRole === "admin" && investment.status === "pending";
+  const showStatusButtons = userRole === USER_ROLES.ADMIN && investment.status === INVESTMENT_STATUSES.PENDING;
+
+  // Przycisk zakończenia dla Admina - tylko gdy status to 'accepted'
+  const showCompleteButton = userRole === USER_ROLES.ADMIN && investment.status === INVESTMENT_STATUSES.ACCEPTED;
 
   // Jeśli nie ma żadnych akcji do wyświetlenia, zwróć null
-  if (!showCancelButton && !showStatusButtons) {
+  if (!showCancelButton && !showStatusButtons && !showCompleteButton) {
     return null;
   }
 
@@ -36,10 +41,13 @@ export function InvestmentActions({
       {showCancelButton && <CancelInvestmentButton onClick={onCancel} isLoading={isLoading} />}
       {showStatusButtons && (
         <UpdateInvestmentStatusButtons
-          onAccept={() => onStatusChange("accepted")}
-          onReject={() => onStatusChange("rejected")}
+          onAccept={() => onStatusChange(INVESTMENT_STATUSES.ACCEPTED)}
+          onReject={() => onStatusChange(INVESTMENT_STATUSES.REJECTED)}
           isLoading={isLoading}
         />
+      )}
+      {showCompleteButton && (
+        <CompleteInvestmentButton onClick={() => onStatusChange(INVESTMENT_STATUSES.COMPLETED)} isLoading={isLoading} />
       )}
     </div>
   );

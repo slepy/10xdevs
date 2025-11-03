@@ -52,7 +52,7 @@ Implementuje dwa endpointy:
 - Walidacja autoryzacji (tylko admin)
 - Walidacja typu pliku (jpg, jpeg, png, webp)
 - Walidacja rozmiaru (max 5MB)
-- Upload do Supabase Storage bucket `offer-images`
+- Upload do Supabase Storage bucket `offer_images`
 - Zwraca publiczny URL obrazu
 
 #### DELETE /api/upload
@@ -75,7 +75,7 @@ images: z.array(z.string().url("Nieprawidłowy URL obrazu")).max(5, "Możesz dod
 
 ### Storage Bucket
 
-Należy utworzyć publiczny bucket o nazwie `offer-images` w Supabase Storage.
+Należy utworzyć publiczny bucket o nazwie `offer_images` w Supabase Storage.
 
 Szczegółowe instrukcje konfiguracji znajdują się w pliku:
 `.ai/supabase-storage-setup.md`

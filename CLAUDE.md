@@ -64,7 +64,7 @@ docker-compose up prod  # Run production build in Docker
 ```bash
 supabase start          # Start local Supabase instance
 supabase stop           # Stop local Supabase instance
-supabase db reset       # Reset database with migrations
+npx supabase migration run #run migration 
 supabase gen types typescript --local > src/db/database.types.ts  # Generate types
 ```
 

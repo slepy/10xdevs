@@ -54,7 +54,7 @@ export type InvestmentQueryParams = z.infer<typeof investmentQuerySchema>;
 /**
  * Dozwolone statusy dla aktualizacji przez administratora
  */
-export const adminUpdateStatusValues = ["accepted", "rejected", "closed"] as const;
+export const adminUpdateStatusValues = ["accepted", "rejected", "completed"] as const;
 
 /**
  * Schema walidacji dla aktualizacji statusu inwestycji przez administratora
@@ -63,7 +63,7 @@ export const adminUpdateStatusValues = ["accepted", "rejected", "closed"] as con
 export const updateInvestmentStatusSchema = z
   .object({
     status: z.enum(adminUpdateStatusValues, {
-      errorMap: () => ({ message: "Status musi być jednym z: accepted, rejected, closed" }),
+      errorMap: () => ({ message: "Status musi być jednym z: accepted, rejected, completed" }),
     }),
     reason: z.string().min(1, "Powód jest wymagany").optional(),
   })

@@ -380,9 +380,8 @@ describe("InvestmentsService", () => {
 
       // Sprawdzenie wywołań
       expect(mockSupabase.from).toHaveBeenCalledWith("investments");
-      expect(mockQuery.select).toHaveBeenCalledWith("*", { count: "exact" });
+      expect(mockQuery.select).toHaveBeenCalledWith("*, offers(name)", { count: "exact" });
       expect(mockQuery.eq).toHaveBeenCalledWith("user_id", userId);
-      expect(mockQuery.is).toHaveBeenCalledWith("deleted_at", null);
       expect(mockQuery.order).toHaveBeenCalledWith("created_at", { ascending: false });
       expect(mockQuery.range).toHaveBeenCalledWith(0, 9); // page 1, limit 10
 
@@ -567,7 +566,6 @@ describe("InvestmentsService", () => {
       // Sprawdzenie że NIE filtruje po user_id (brak wywołania eq z user_id)
       expect(mockSupabase.from).toHaveBeenCalledWith("investments");
       expect(mockQuery.select).toHaveBeenCalledWith("*", { count: "exact" });
-      expect(mockQuery.is).toHaveBeenCalledWith("deleted_at", null);
       expect(mockQuery.order).toHaveBeenCalledWith("created_at", { ascending: false });
 
       // Sprawdzenie wyniku
@@ -647,26 +645,6 @@ describe("InvestmentsService", () => {
         "Błąd podczas pobierania inwestycji"
       );
     });
-
-    it("should exclude soft-deleted investments", async () => {
-      const mockQuery = {
-        select: vi.fn().mockReturnThis(),
-        is: vi.fn().mockReturnThis(),
-        order: vi.fn().mockReturnThis(),
-        range: vi.fn().mockResolvedValue({
-          data: mockAllInvestments,
-          error: null,
-          count: 3,
-        }),
-      };
-
-      vi.mocked(mockSupabase.from).mockReturnValue(mockQuery as any);
-
-      await investmentsService.getAllInvestments(queryParams);
-
-      // Sprawdzenie że wyklucza deleted_at
-      expect(mockQuery.is).toHaveBeenCalledWith("deleted_at", null);
-    });
   });
 
   describe("getInvestmentDetails", () => {
@@ -722,9 +700,7 @@ describe("InvestmentsService", () => {
 
       // Sprawdzenie wywołań
       expect(mockSupabase.from).toHaveBeenCalledWith("investments");
-      expect(mockQuery.select).toHaveBeenCalledWith(
-        expect.stringContaining("offers(*)")
-      );
+      expect(mockQuery.select).toHaveBeenCalledWith(expect.stringContaining("offers(*)"));
       expect(mockQuery.select).toHaveBeenCalledWith(
         expect.stringContaining("users_view(id, email, role, first_name, last_name)")
       );
@@ -789,9 +765,9 @@ describe("InvestmentsService", () => {
 
       vi.mocked(mockSupabase.from).mockReturnValue(mockQuery as any);
 
-      await expect(
-        investmentsService.getInvestmentDetails(investmentId, userId, false)
-      ).rejects.toThrow("Inwestycja o podanym ID nie istnieje");
+      await expect(investmentsService.getInvestmentDetails(investmentId, userId, false)).rejects.toThrow(
+        "Inwestycja o podanym ID nie istnieje"
+      );
     });
 
     it("should throw 403 error when non-admin user tries to access another user's investment", async () => {
@@ -809,9 +785,9 @@ describe("InvestmentsService", () => {
       vi.mocked(mockSupabase.from).mockReturnValue(mockQuery as any);
 
       // Użytkownik other-user-789 (nie admin) próbuje pobrać inwestycję należącą do user-123
-      await expect(
-        investmentsService.getInvestmentDetails(investmentId, otherUserId, false)
-      ).rejects.toThrow("Brak dostępu - nie masz uprawnień do przeglądania tej inwestycji");
+      await expect(investmentsService.getInvestmentDetails(investmentId, otherUserId, false)).rejects.toThrow(
+        "Brak dostępu - nie masz uprawnień do przeglądania tej inwestycji"
+      );
     });
 
     it("should throw error when offer data is missing", async () => {
@@ -831,9 +807,9 @@ describe("InvestmentsService", () => {
 
       vi.mocked(mockSupabase.from).mockReturnValue(mockQuery as any);
 
-      await expect(
-        investmentsService.getInvestmentDetails(investmentId, userId, false)
-      ).rejects.toThrow("Nie udało się pobrać danych oferty powiązanej z inwestycją");
+      await expect(investmentsService.getInvestmentDetails(investmentId, userId, false)).rejects.toThrow(
+        "Nie udało się pobrać danych oferty powiązanej z inwestycją"
+      );
     });
 
     it("should throw error when user data is missing", async () => {
@@ -853,9 +829,9 @@ describe("InvestmentsService", () => {
 
       vi.mocked(mockSupabase.from).mockReturnValue(mockQuery as any);
 
-      await expect(
-        investmentsService.getInvestmentDetails(investmentId, userId, false)
-      ).rejects.toThrow("Nie udało się pobrać danych użytkownika powiązanego z inwestycją");
+      await expect(investmentsService.getInvestmentDetails(investmentId, userId, false)).rejects.toThrow(
+        "Nie udało się pobrać danych użytkownika powiązanego z inwestycją"
+      );
     });
 
     it("should throw error when user data has missing required fields", async () => {
@@ -881,9 +857,9 @@ describe("InvestmentsService", () => {
 
       vi.mocked(mockSupabase.from).mockReturnValue(mockQuery as any);
 
-      await expect(
-        investmentsService.getInvestmentDetails(investmentId, userId, false)
-      ).rejects.toThrow("Brakujące dane użytkownika w rekordzie inwestycji");
+      await expect(investmentsService.getInvestmentDetails(investmentId, userId, false)).rejects.toThrow(
+        "Brakujące dane użytkownika w rekordzie inwestycji"
+      );
     });
 
     it("should handle nullable first_name and last_name fields", async () => {
@@ -945,6 +921,305 @@ describe("InvestmentsService", () => {
       expect(result.amount).toBe(1234.56);
       expect(result.offer.target_amount).toBe(50000);
       expect(result.offer.minimum_investment).toBe(500);
+    });
+  });
+
+  describe("cancelInvestment", () => {
+    const userId = "user-123";
+    const investmentId = "investment-123";
+
+    it("should cancel investment and set deleted_at", async () => {
+      const cancelData = {
+        reason: "User changed mind",
+      };
+
+      const mockPendingInvestment = {
+        id: investmentId,
+        user_id: userId,
+        offer_id: "offer-123",
+        amount: 500000, // w centach
+        status: "pending",
+        created_at: "2025-01-01T10:00:00Z",
+        updated_at: "2025-01-01T10:00:00Z",
+        completed_at: null,
+        reason: null,
+        deleted_at: null,
+      };
+
+      const mockCancelledInvestment = {
+        ...mockPendingInvestment,
+        status: "cancelled",
+        reason: cancelData.reason,
+        deleted_at: "2025-01-01T11:00:00Z",
+      };
+
+      // Mock dla getInvestmentById (select)
+      const mockSelectQuery = {
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+        single: vi.fn().mockResolvedValue({
+          data: mockPendingInvestment,
+          error: null,
+        }),
+      };
+
+      // Mock dla update
+      const mockUpdateQuery = {
+        update: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+        select: vi.fn().mockReturnThis(),
+        single: vi.fn().mockResolvedValue({
+          data: mockCancelledInvestment,
+          error: null,
+        }),
+      };
+
+      // Pierwsze wywołanie - select, drugie - update
+      vi.mocked(mockSupabase.from)
+        .mockReturnValueOnce(mockSelectQuery as any)
+        .mockReturnValueOnce(mockUpdateQuery as any);
+
+      const result = await investmentsService.cancelInvestment(investmentId, userId, cancelData);
+
+      // Sprawdzenie że update został wywołany z deleted_at
+      expect(mockUpdateQuery.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          status: "cancelled",
+          reason: cancelData.reason,
+          deleted_at: expect.any(String),
+          updated_at: expect.any(String),
+        })
+      );
+
+      // Sprawdzenie wyniku
+      expect(result.status).toBe("cancelled");
+      expect(result.reason).toBe(cancelData.reason);
+      expect(result.amount).toBe(5000); // skonwertowane z centów
+    });
+
+    it("should throw error when user is not owner", async () => {
+      const mockPendingInvestment = {
+        id: investmentId,
+        user_id: "other-user-456",
+        status: "pending",
+      };
+
+      const mockQuery = {
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+        single: vi.fn().mockResolvedValue({
+          data: mockPendingInvestment,
+          error: null,
+        }),
+      };
+
+      vi.mocked(mockSupabase.from).mockReturnValue(mockQuery as any);
+
+      await expect(investmentsService.cancelInvestment(investmentId, userId, { reason: "Test" })).rejects.toThrow(
+        "Brak dostępu - możesz anulować tylko własne inwestycje"
+      );
+    });
+
+    it("should throw error when investment is not pending", async () => {
+      const mockAcceptedInvestment = {
+        id: investmentId,
+        user_id: userId,
+        status: "accepted",
+      };
+
+      const mockQuery = {
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+        single: vi.fn().mockResolvedValue({
+          data: mockAcceptedInvestment,
+          error: null,
+        }),
+      };
+
+      vi.mocked(mockSupabase.from).mockReturnValue(mockQuery as any);
+
+      await expect(investmentsService.cancelInvestment(investmentId, userId, { reason: "Test" })).rejects.toThrow(
+        "Nie można anulować inwestycji ze statusem 'accepted'"
+      );
+    });
+  });
+
+  describe("updateInvestmentStatus", () => {
+    const investmentId = "investment-123";
+
+    it("should set deleted_at when rejecting investment with reason", async () => {
+      const updateData = {
+        status: "rejected" as const,
+        reason: "Investment does not meet criteria",
+      };
+
+      const mockPendingInvestment = {
+        id: investmentId,
+        user_id: "user-123",
+        offer_id: "offer-123",
+        amount: 500000,
+        status: "pending",
+        created_at: "2025-01-01T10:00:00Z",
+        updated_at: "2025-01-01T10:00:00Z",
+        completed_at: null,
+        reason: null,
+        deleted_at: null,
+      };
+
+      const mockRejectedInvestment = {
+        ...mockPendingInvestment,
+        status: "rejected",
+        reason: updateData.reason,
+        deleted_at: "2025-01-01T11:00:00Z",
+      };
+
+      // Mock dla getInvestmentById (select)
+      const mockSelectQuery = {
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+        single: vi.fn().mockResolvedValue({
+          data: mockPendingInvestment,
+          error: null,
+        }),
+      };
+
+      // Mock dla update
+      const mockUpdateQuery = {
+        update: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+        select: vi.fn().mockReturnThis(),
+        single: vi.fn().mockResolvedValue({
+          data: mockRejectedInvestment,
+          error: null,
+        }),
+      };
+
+      vi.mocked(mockSupabase.from)
+        .mockReturnValueOnce(mockSelectQuery as any)
+        .mockReturnValueOnce(mockUpdateQuery as any);
+
+      const result = await investmentsService.updateInvestmentStatus(investmentId, updateData);
+
+      // Sprawdzenie że update został wywołany z deleted_at
+      expect(mockUpdateQuery.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          status: "rejected",
+          reason: updateData.reason,
+          deleted_at: expect.any(String),
+          updated_at: expect.any(String),
+        })
+      );
+
+      expect(result.status).toBe("rejected");
+      expect(result.reason).toBe(updateData.reason);
+    });
+
+    it("should NOT set deleted_at when rejecting without reason", async () => {
+      const updateData = {
+        status: "rejected" as const,
+      };
+
+      const mockPendingInvestment = {
+        id: investmentId,
+        status: "pending",
+        amount: 500000,
+      };
+
+      const mockRejectedInvestment = {
+        ...mockPendingInvestment,
+        status: "rejected",
+      };
+
+      const mockSelectQuery = {
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+        single: vi.fn().mockResolvedValue({
+          data: mockPendingInvestment,
+          error: null,
+        }),
+      };
+
+      const mockUpdateQuery = {
+        update: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+        select: vi.fn().mockReturnThis(),
+        single: vi.fn().mockResolvedValue({
+          data: mockRejectedInvestment,
+          error: null,
+        }),
+      };
+
+      vi.mocked(mockSupabase.from)
+        .mockReturnValueOnce(mockSelectQuery as any)
+        .mockReturnValueOnce(mockUpdateQuery as any);
+
+      await investmentsService.updateInvestmentStatus(investmentId, updateData);
+
+      // Sprawdzenie że update NIE zawiera deleted_at
+      expect(mockUpdateQuery.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          status: "rejected",
+          reason: null,
+        })
+      );
+      expect(mockUpdateQuery.update).toHaveBeenCalledWith(
+        expect.not.objectContaining({
+          deleted_at: expect.any(String),
+        })
+      );
+    });
+
+    it("should set completed_at when completing investment", async () => {
+      const updateData = {
+        status: "completed" as const,
+      };
+
+      const mockAcceptedInvestment = {
+        id: investmentId,
+        status: "accepted",
+        amount: 500000,
+      };
+
+      const mockCompletedInvestment = {
+        ...mockAcceptedInvestment,
+        status: "completed",
+        completed_at: "2025-01-01T11:00:00Z",
+      };
+
+      const mockSelectQuery = {
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+        single: vi.fn().mockResolvedValue({
+          data: mockAcceptedInvestment,
+          error: null,
+        }),
+      };
+
+      const mockUpdateQuery = {
+        update: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+        select: vi.fn().mockReturnThis(),
+        single: vi.fn().mockResolvedValue({
+          data: mockCompletedInvestment,
+          error: null,
+        }),
+      };
+
+      vi.mocked(mockSupabase.from)
+        .mockReturnValueOnce(mockSelectQuery as any)
+        .mockReturnValueOnce(mockUpdateQuery as any);
+
+      const result = await investmentsService.updateInvestmentStatus(investmentId, updateData);
+
+      // Sprawdzenie że update zawiera completed_at
+      expect(mockUpdateQuery.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          status: "completed",
+          completed_at: expect.any(String),
+        })
+      );
+
+      expect(result.status).toBe("completed");
     });
   });
 });

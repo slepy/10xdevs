@@ -236,8 +236,8 @@ export class OffersService {
       // Konwersja kwot z groszy na PLN przed zwróceniem do frontendu
       return {
         ...data,
-        target_amount: this.convertFromSatoshi(data.target_amount),
-        minimum_investment: this.convertFromSatoshi(data.minimum_investment),
+        target_amount: convertFromSatoshi(data.target_amount),
+        minimum_investment: convertFromSatoshi(data.minimum_investment),
       };
     } catch (error) {
       if (error instanceof Error) {

@@ -26,12 +26,12 @@ import { getAllowedStatusTransitions } from "../investment-status";
  */
 export class InvestmentsService {
   /**
-   * Mapowanie statusów admina (z API) na statusy systemowe (w bazie danych)
+   * Mapowanie statusów z API na statusy w bazie danych
    */
   private static readonly STATUS_MAPPING: Record<string, string> = {
     accepted: INVESTMENT_STATUSES.ACCEPTED,
     rejected: INVESTMENT_STATUSES.REJECTED,
-    closed: INVESTMENT_STATUSES.COMPLETED,
+    completed: INVESTMENT_STATUSES.COMPLETED,
   };
 
   constructor(private supabase: SupabaseClient) {}
@@ -399,6 +399,7 @@ export class InvestmentsService {
         status: string;
         reason?: string | null;
         completed_at?: string | null;
+        deleted_at?: string | null;
         updated_at: string;
       } = {
         status: mappedStatus,
@@ -409,6 +410,11 @@ export class InvestmentsService {
       // 5. Ustawienie completed_at dla statusu "completed" (closed z API)
       if (mappedStatus === INVESTMENT_STATUSES.COMPLETED) {
         updateData.completed_at = new Date().toISOString();
+      }
+
+      // 6. Ustawienie deleted_at dla statusu "rejected" (gdy jest powód odrzucenia)
+      if (mappedStatus === INVESTMENT_STATUSES.REJECTED && data.reason) {
+        updateData.deleted_at = new Date().toISOString();
       }
 
       // 6. Aktualizacja w bazie danych
@@ -450,6 +456,7 @@ export class InvestmentsService {
       const updateData = {
         status: INVESTMENT_STATUSES.CANCELLED,
         reason: data.reason,
+        deleted_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       };
 
@@ -496,6 +503,7 @@ export class InvestmentsService {
       status: string;
       reason?: string | null;
       completed_at?: string | null;
+      deleted_at?: string | null;
       updated_at: string;
     }
   ): Promise<InvestmentDTO> {
@@ -507,7 +515,9 @@ export class InvestmentsService {
       .single();
 
     if (updateError || !updatedInvestment) {
-      throw new Error("Nie udało się zaktualizować inwestycji");
+      // eslint-disable-next-line no-console
+      console.error("Database update error:", updateError);
+      throw new Error(`Nie udało się zaktualizować inwestycji: ${updateError?.message || "Nieznany błąd bazy danych"}`);
     }
 
     // Konwersja kwoty z centów na PLN przed zwróceniem

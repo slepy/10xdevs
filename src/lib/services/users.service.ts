@@ -32,11 +32,13 @@ export class UsersService {
    */
   async listUsers(params: ListQueryParams): Promise<UserListResponse> {
     const { page = 1, limit = 100, filter, sort } = params;
+    const maxPageSize = 100;
+    const perPage = Math.min(limit, maxPageSize);
 
     try {
       const { data, error } = await supabaseAdminClient.auth.admin.listUsers({
         page,
-        perPage: limit,
+        perPage,
       });
 
       if (error) {
@@ -51,8 +53,8 @@ export class UsersService {
         users = users.filter(
           (user) =>
             user.email.toLowerCase().includes(lowercasedFilter) ||
-            user.firstName.toLowerCase().includes(lowercasedFilter) ||
-            user.lastName.toLowerCase().includes(lowercasedFilter) ||
+            user.firstName?.toLowerCase().includes(lowercasedFilter) ||
+            user.lastName?.toLowerCase().includes(lowercasedFilter) ||
             user.role.toLowerCase().includes(lowercasedFilter)
         );
       }
@@ -72,13 +74,13 @@ export class UsersService {
       }
 
       const total = users.length;
-      const totalPages = Math.ceil(total / limit);
+      const totalPages = Math.ceil(total / perPage);
 
       return {
         data: users,
         pagination: {
           page,
-          limit,
+          limit: perPage,
           total,
           totalPages,
         },

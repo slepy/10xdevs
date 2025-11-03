@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { createInvestmentSchema } from "./investments.validator";
+import { createInvestmentSchema, updateInvestmentStatusSchema } from "./investments.validator";
 
 describe("createInvestmentSchema", () => {
   describe("valid data", () => {
@@ -171,6 +171,111 @@ describe("createInvestmentSchema", () => {
       if (result.success) {
         expect(result.data.amount).toBe(1234.56);
       }
+    });
+  });
+});
+
+describe("updateInvestmentStatusSchema", () => {
+  describe("valid status updates", () => {
+    it("should accept 'accepted' status without reason", () => {
+      const validData = {
+        status: "accepted",
+      };
+
+      const result = updateInvestmentStatusSchema.safeParse(validData);
+
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data.status).toBe("accepted");
+        expect(result.data.reason).toBeUndefined();
+      }
+    });
+
+    it("should accept 'completed' status without reason", () => {
+      const validData = {
+        status: "completed",
+      };
+
+      const result = updateInvestmentStatusSchema.safeParse(validData);
+
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data.status).toBe("completed");
+        expect(result.data.reason).toBeUndefined();
+      }
+    });
+
+    it("should accept 'rejected' status with reason", () => {
+      const validData = {
+        status: "rejected",
+        reason: "Niepoprawne dokumenty",
+      };
+
+      const result = updateInvestmentStatusSchema.safeParse(validData);
+
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data.status).toBe("rejected");
+        expect(result.data.reason).toBe("Niepoprawne dokumenty");
+      }
+    });
+  });
+
+  describe("invalid status updates", () => {
+    it("should reject 'rejected' status without reason", () => {
+      const invalidData = {
+        status: "rejected",
+      };
+
+      const result = updateInvestmentStatusSchema.safeParse(invalidData);
+
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        const reasonError = result.error.issues.find((issue) => issue.path[0] === "reason");
+        expect(reasonError?.message).toBe("Powód odrzucenia jest wymagany dla statusu 'rejected'");
+      }
+    });
+
+    it("should reject invalid status value", () => {
+      const invalidData = {
+        status: "pending",
+      };
+
+      const result = updateInvestmentStatusSchema.safeParse(invalidData);
+
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error.issues[0].message).toBe("Status musi być jednym z: accepted, rejected, completed");
+      }
+    });
+
+    it("should reject 'cancelled' status (not allowed for admin)", () => {
+      const invalidData = {
+        status: "cancelled",
+      };
+
+      const result = updateInvestmentStatusSchema.safeParse(invalidData);
+
+      expect(result.success).toBe(false);
+    });
+
+    it("should reject empty reason for 'rejected' status", () => {
+      const invalidData = {
+        status: "rejected",
+        reason: "",
+      };
+
+      const result = updateInvestmentStatusSchema.safeParse(invalidData);
+
+      expect(result.success).toBe(false);
+    });
+
+    it("should reject missing status", () => {
+      const invalidData = {};
+
+      const result = updateInvestmentStatusSchema.safeParse(invalidData);
+
+      expect(result.success).toBe(false);
     });
   });
 });

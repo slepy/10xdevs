@@ -1,7 +1,6 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/admin/EmptyState";
-import { getInvestmentStatusBadge } from "@/lib/investment-status";
+import { InvestmentStatusBadge } from "@/components/investment-details/InvestmentStatusBadge";
 import type { InvestmentViewModel } from "@/types";
 
 interface InvestmentsTableProps {
@@ -37,8 +36,6 @@ export function InvestmentsTable({ investments, onRowClick }: InvestmentsTablePr
         </TableHeader>
         <TableBody>
           {investments.map((investment) => {
-            const statusConfig = getInvestmentStatusBadge(investment.status);
-
             return (
               <TableRow
                 key={investment.id}
@@ -57,7 +54,7 @@ export function InvestmentsTable({ investments, onRowClick }: InvestmentsTablePr
                 <TableCell>{investment.amount}</TableCell>
                 <TableCell className="text-gray-600">{investment.submissionDate}</TableCell>
                 <TableCell>
-                  <Badge variant={statusConfig.variant}>{statusConfig.label}</Badge>
+                  <InvestmentStatusBadge status={investment.status} />
                 </TableCell>
               </TableRow>
             );

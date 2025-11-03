@@ -276,6 +276,36 @@ export interface UpdateUserResponse extends ApiResponse {
 }
 
 // ============================================================================
+// INVESTMENT FILES - DTO & COMMAND MODELS
+// ============================================================================
+
+/**
+ * Full investment file data as returned by API
+ */
+export type InvestmentFileDTO = Tables<"investment_files">;
+
+/**
+ * Response for investment files list endpoint
+ */
+export interface InvestmentFilesListResponse extends ApiResponse {
+  data?: InvestmentFileDTO[];
+}
+
+/**
+ * Response for single file upload
+ */
+export interface InvestmentFileUploadResponse extends ApiResponse {
+  data?: InvestmentFileDTO;
+}
+
+/**
+ * Response for file deletion
+ */
+export interface InvestmentFileDeleteResponse extends ApiResponse {
+  message?: string;
+}
+
+// ============================================================================
 // VALIDATION & ERROR TYPES
 // ============================================================================
 
