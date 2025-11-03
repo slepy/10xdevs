@@ -76,6 +76,7 @@ supabase gen types typescript --local > src/db/database.types.ts  # Generate typ
 - `src/pages/api/` - API endpoints (server-only)
 - `src/layouts/` - Astro layout components
 - `src/components/` - Static Astro components and dynamic React components
+- `src/components/base/` - base components
 - `src/components/ui/` - Shadcn/ui components
 - `src/middleware/index.ts` - Astro middleware (auth, Supabase client injection)
 - `src/db/` - Supabase client and generated database types

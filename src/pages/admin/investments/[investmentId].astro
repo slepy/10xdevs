@@ -1,0 +1,24 @@
+---
+import AdminLayout from "../../../layouts/AdminLayout.astro";
+import { InvestmentDetailsView } from "../../../components/investment-details/InvestmentDetailsView";
+
+export const prerender = false;
+
+// AdminLayout automatically requires authentication and admin role
+
+const { investmentId } = Astro.params;
+
+if (!investmentId) {
+  return Astro.redirect("/admin/investments");
+}
+---
+
+<AdminLayout title="Szczegóły Inwestycji - Panel Administracyjny">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <InvestmentDetailsView
+      client:load
+      investmentId={investmentId}
+      userRole="admin"
+    />
+  </div>
+</AdminLayout>

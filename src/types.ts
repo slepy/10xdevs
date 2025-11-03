@@ -451,3 +451,18 @@ export interface InvestmentViewModel {
   status: InvestmentStatus;
   submissionDate: string;
 }
+
+/**
+ * ViewModel for the Investment Details page.
+ * Combines investment data with related offer and user details.
+ */
+export interface InvestmentDetailsViewModel {
+  id: string;
+  amount: number;
+  status: InvestmentStatus;
+  created_at: string;
+  completed_at?: string | null;
+  reason?: string | null;
+  offer: OfferDTO;
+  user?: UserDTO; // Optional, as it's only available for Admins
+}

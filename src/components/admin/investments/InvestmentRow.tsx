@@ -1,5 +1,4 @@
 import type { AdminInvestmentViewModel } from "./AdminInvestmentsView";
-import type { InvestmentStatus } from "@/types";
 import { TableCell, TableRow } from "../../ui/table";
 import { Badge } from "../../ui/badge";
 import { InvestmentActions } from "./InvestmentActions";
@@ -7,10 +6,9 @@ import { getInvestmentStatusBadge } from "@/lib/investment-status";
 
 export interface InvestmentRowProps {
   investment: AdminInvestmentViewModel;
-  onStatusChange: (investmentId: string, newStatus: InvestmentStatus) => void;
 }
 
-export function InvestmentRow({ investment, onStatusChange }: InvestmentRowProps) {
+export function InvestmentRow({ investment }: InvestmentRowProps) {
   const statusConfig = getInvestmentStatusBadge(investment.status);
   return (
     <TableRow>
@@ -23,11 +21,7 @@ export function InvestmentRow({ investment, onStatusChange }: InvestmentRowProps
       </TableCell>
       <TableCell>{investment.submissionDate}</TableCell>
       <TableCell className="text-right">
-        <InvestmentActions
-          investmentId={investment.id}
-          currentStatus={investment.status}
-          onStatusChange={onStatusChange}
-        />
+        <InvestmentActions investmentId={investment.id} />
       </TableCell>
     </TableRow>
   );

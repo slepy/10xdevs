@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import type { InvestmentStatus, PaginatedResponse, InvestmentQueryParams, InvestmentWithRelationsDTO } from "@/types";
+import type { PaginatedResponse, InvestmentQueryParams, InvestmentWithRelationsDTO, InvestmentStatus } from "@/types";
 import { InvestmentsFilters } from "./InvestmentsFilters";
 import { InvestmentsTable } from "./InvestmentsTable";
 import { Pagination } from "../../Pagination";
@@ -124,29 +124,6 @@ export function AdminInvestmentsView() {
     }));
   };
 
-  // Handle status change for an investment
-  const handleStatusChange = async (investmentId: string, newStatus: InvestmentStatus) => {
-    try {
-      const response = await fetch(`/api/investments/${investmentId}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ status: newStatus }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Nie udało się zaktualizować statusu inwestycji");
-      }
-
-      // Refresh the list after successful update
-      setQueryParams((prev) => ({ ...prev }));
-    } catch (err) {
-      // TODO: Show toast notification with error
-      setError(err instanceof Error ? err.message : "Wystąpił błąd");
-    }
-  };
-
   const isLoading = status === "loading";
   const hasError = status === "error";
   const isEmpty = status === "success" && (!data?.data || data.data.length === 0);
@@ -172,7 +149,7 @@ export function AdminInvestmentsView() {
 
       {status === "success" && data && data.data.length > 0 && (
         <>
-          <InvestmentsTable investments={data.data} onStatusChange={handleStatusChange} />
+          <InvestmentsTable investments={data.data} />
           <Pagination pagination={data.pagination} onPageChange={handlePageChange} />
         </>
       )}

@@ -131,7 +131,7 @@ Do implementacji widoku wykorzystane zostaną istniejące typy DTO. Dodatkowo, s
     images: string[];
     // Sformatowane wartości finansowe
     target_amount: string; // np. "500 000,00 zł"
-    min_investment: string; // np. "1 000,00 zł"
+    minimum_investment: string; // np. "1 000,00 zł"
     max_investment: string; // np. "50 000,00 zł"
     // Wartości numeryczne do logiki
     funding_goal_achieved_percent: number; // np. 75

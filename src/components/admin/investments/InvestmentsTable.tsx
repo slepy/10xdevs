@@ -1,14 +1,12 @@
 import type { AdminInvestmentViewModel } from "./AdminInvestmentsView";
-import type { InvestmentStatus } from "@/types";
 import { Table, TableBody, TableHead, TableHeader, TableRow } from "../../ui/table";
 import { InvestmentRow } from "./InvestmentRow";
 
 export interface InvestmentsTableProps {
   investments: AdminInvestmentViewModel[];
-  onStatusChange: (investmentId: string, newStatus: InvestmentStatus) => void;
 }
 
-export function InvestmentsTable({ investments, onStatusChange }: InvestmentsTableProps) {
+export function InvestmentsTable({ investments }: InvestmentsTableProps) {
   return (
     <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
       <Table>
@@ -25,7 +23,7 @@ export function InvestmentsTable({ investments, onStatusChange }: InvestmentsTab
         </TableHeader>
         <TableBody>
           {investments.map((investment) => (
-            <InvestmentRow key={investment.id} investment={investment} onStatusChange={onStatusChange} />
+            <InvestmentRow key={investment.id} investment={investment} />
           ))}
         </TableBody>
       </Table>
