@@ -126,6 +126,14 @@ export type UpdateInvestmentStatusDTO = Pick<TablesUpdate<"investments">, "statu
 };
 
 /**
+ * DTO for cancelling an investment by user (PUT /api/investments/:investmentId/cancel)
+ * Used when a Signer wants to cancel their own pending investment
+ */
+export interface CancelInvestmentDTO {
+  reason: string;
+}
+
+/**
  * Full investment data as returned by API
  */
 export type InvestmentDTO = Tables<"investments">;
@@ -378,6 +386,16 @@ export interface InvestmentWithRelationsDTO extends InvestmentDTO {
 }
 
 /**
+ * Extended investment data with full offer and user details
+ * Used for GET /api/investments/:investmentId endpoint
+ * Returns complete investment information including related offer and user data
+ */
+export interface InvestmentDetailsDTO extends InvestmentDTO {
+  offer: OfferDTO;
+  user: UserDTO;
+}
+
+/**
  * Response for admin investments list endpoint (GET /api/investments/admin)
  * Includes offer and user data for each investment
  */
@@ -420,4 +438,16 @@ export interface OfferDetailsViewModel {
   minimum_investment: string; // e.g., "1 000,00 zł"
   // Raw numeric values for form validation and business logic
   minimum_investment_raw: number; // Raw value in PLN (already converted from cents by backend)
+}
+
+/**
+ * View model for investment display in "My Investments" view
+ * Contains formatted data ready for display in components
+ */
+export interface InvestmentViewModel {
+  id: string;
+  offerName: string;
+  amount: string;
+  status: InvestmentStatus;
+  submissionDate: string;
 }

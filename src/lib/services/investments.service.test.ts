@@ -668,4 +668,283 @@ describe("InvestmentsService", () => {
       expect(mockQuery.is).toHaveBeenCalledWith("deleted_at", null);
     });
   });
+
+  describe("getInvestmentDetails", () => {
+    const userId = "user-123";
+    const investmentId = "investment-123";
+    const adminUserId = "admin-456";
+
+    const mockInvestmentWithRelations = {
+      id: investmentId,
+      user_id: userId,
+      offer_id: "offer-123",
+      amount: 500000, // 5000 PLN w centach
+      status: INVESTMENT_STATUSES.PENDING,
+      created_at: "2024-01-15T10:00:00Z",
+      updated_at: "2024-01-15T10:00:00Z",
+      completed_at: null,
+      reason: null,
+      deleted_at: null,
+      offers: {
+        id: "offer-123",
+        name: "Test Offer",
+        description: "Test description",
+        target_amount: 10000000, // 100 000 PLN w centach
+        minimum_investment: 100000, // 1000 PLN w centach
+        status: OFFER_STATUSES.ACTIVE,
+        created_at: "2024-01-01T10:00:00Z",
+        updated_at: "2024-01-01T10:00:00Z",
+        start_at: "2024-01-01T00:00:00Z",
+        end_at: "2024-12-31T23:59:59Z",
+      },
+      users_view: {
+        id: userId,
+        email: "user@example.com",
+        role: "signer",
+        first_name: "John",
+        last_name: "Doe",
+      },
+    };
+
+    it("should successfully fetch investment details for owner", async () => {
+      const mockQuery = {
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+        single: vi.fn().mockResolvedValue({
+          data: mockInvestmentWithRelations,
+          error: null,
+        }),
+      };
+
+      vi.mocked(mockSupabase.from).mockReturnValue(mockQuery as any);
+
+      const result = await investmentsService.getInvestmentDetails(investmentId, userId, false);
+
+      // Sprawdzenie wywołań
+      expect(mockSupabase.from).toHaveBeenCalledWith("investments");
+      expect(mockQuery.select).toHaveBeenCalledWith(
+        expect.stringContaining("offers(*)")
+      );
+      expect(mockQuery.select).toHaveBeenCalledWith(
+        expect.stringContaining("users_view(id, email, role, first_name, last_name)")
+      );
+      expect(mockQuery.eq).toHaveBeenCalledWith("id", investmentId);
+
+      // Sprawdzenie wyniku (konwersje kwot)
+      expect(result).toMatchObject({
+        id: investmentId,
+        user_id: userId,
+        offer_id: "offer-123",
+        amount: 5000, // Konwersja z centów na PLN
+        status: INVESTMENT_STATUSES.PENDING,
+      });
+
+      // Sprawdzenie zagnieżdżonych danych oferty
+      expect(result.offer).toMatchObject({
+        id: "offer-123",
+        name: "Test Offer",
+        target_amount: 100000, // Konwersja z centów
+        minimum_investment: 1000, // Konwersja z centów
+      });
+
+      // Sprawdzenie zagnieżdżonych danych użytkownika (snake_case -> camelCase)
+      expect(result.user).toMatchObject({
+        id: userId,
+        email: "user@example.com",
+        firstName: "John",
+        lastName: "Doe",
+        role: "signer",
+      });
+    });
+
+    it("should successfully fetch investment details for admin (not owner)", async () => {
+      const mockQuery = {
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+        single: vi.fn().mockResolvedValue({
+          data: mockInvestmentWithRelations,
+          error: null,
+        }),
+      };
+
+      vi.mocked(mockSupabase.from).mockReturnValue(mockQuery as any);
+
+      // Admin (adminUserId) próbuje pobrać inwestycję należącą do userId
+      const result = await investmentsService.getInvestmentDetails(investmentId, adminUserId, true);
+
+      // Admin powinien mieć dostęp mimo że nie jest właścicielem
+      expect(result.id).toBe(investmentId);
+      expect(result.user_id).toBe(userId); // Właściciel to user-123, nie admin-456
+    });
+
+    it("should throw 404 error when investment does not exist", async () => {
+      const mockQuery = {
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+        single: vi.fn().mockResolvedValue({
+          data: null,
+          error: { message: "Not found" },
+        }),
+      };
+
+      vi.mocked(mockSupabase.from).mockReturnValue(mockQuery as any);
+
+      await expect(
+        investmentsService.getInvestmentDetails(investmentId, userId, false)
+      ).rejects.toThrow("Inwestycja o podanym ID nie istnieje");
+    });
+
+    it("should throw 403 error when non-admin user tries to access another user's investment", async () => {
+      const otherUserId = "other-user-789";
+
+      const mockQuery = {
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+        single: vi.fn().mockResolvedValue({
+          data: mockInvestmentWithRelations,
+          error: null,
+        }),
+      };
+
+      vi.mocked(mockSupabase.from).mockReturnValue(mockQuery as any);
+
+      // Użytkownik other-user-789 (nie admin) próbuje pobrać inwestycję należącą do user-123
+      await expect(
+        investmentsService.getInvestmentDetails(investmentId, otherUserId, false)
+      ).rejects.toThrow("Brak dostępu - nie masz uprawnień do przeglądania tej inwestycji");
+    });
+
+    it("should throw error when offer data is missing", async () => {
+      const investmentWithoutOffer = {
+        ...mockInvestmentWithRelations,
+        offers: null,
+      };
+
+      const mockQuery = {
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+        single: vi.fn().mockResolvedValue({
+          data: investmentWithoutOffer,
+          error: null,
+        }),
+      };
+
+      vi.mocked(mockSupabase.from).mockReturnValue(mockQuery as any);
+
+      await expect(
+        investmentsService.getInvestmentDetails(investmentId, userId, false)
+      ).rejects.toThrow("Nie udało się pobrać danych oferty powiązanej z inwestycją");
+    });
+
+    it("should throw error when user data is missing", async () => {
+      const investmentWithoutUser = {
+        ...mockInvestmentWithRelations,
+        users_view: null,
+      };
+
+      const mockQuery = {
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+        single: vi.fn().mockResolvedValue({
+          data: investmentWithoutUser,
+          error: null,
+        }),
+      };
+
+      vi.mocked(mockSupabase.from).mockReturnValue(mockQuery as any);
+
+      await expect(
+        investmentsService.getInvestmentDetails(investmentId, userId, false)
+      ).rejects.toThrow("Nie udało się pobrać danych użytkownika powiązanego z inwestycją");
+    });
+
+    it("should throw error when user data has missing required fields", async () => {
+      const investmentWithIncompleteUser = {
+        ...mockInvestmentWithRelations,
+        users_view: {
+          id: null,
+          email: "user@example.com",
+          role: "signer",
+          first_name: "John",
+          last_name: "Doe",
+        },
+      };
+
+      const mockQuery = {
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+        single: vi.fn().mockResolvedValue({
+          data: investmentWithIncompleteUser,
+          error: null,
+        }),
+      };
+
+      vi.mocked(mockSupabase.from).mockReturnValue(mockQuery as any);
+
+      await expect(
+        investmentsService.getInvestmentDetails(investmentId, userId, false)
+      ).rejects.toThrow("Brakujące dane użytkownika w rekordzie inwestycji");
+    });
+
+    it("should handle nullable first_name and last_name fields", async () => {
+      const investmentWithNullableNames = {
+        ...mockInvestmentWithRelations,
+        users_view: {
+          id: userId,
+          email: "user@example.com",
+          role: "signer",
+          first_name: null,
+          last_name: null,
+        },
+      };
+
+      const mockQuery = {
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+        single: vi.fn().mockResolvedValue({
+          data: investmentWithNullableNames,
+          error: null,
+        }),
+      };
+
+      vi.mocked(mockSupabase.from).mockReturnValue(mockQuery as any);
+
+      const result = await investmentsService.getInvestmentDetails(investmentId, userId, false);
+
+      // firstName i lastName powinny być undefined (nie null)
+      expect(result.user.firstName).toBeUndefined();
+      expect(result.user.lastName).toBeUndefined();
+      expect(result.user.id).toBe(userId);
+      expect(result.user.email).toBe("user@example.com");
+    });
+
+    it("should correctly convert all amounts from cents to PLN", async () => {
+      const investmentWithVariousAmounts = {
+        ...mockInvestmentWithRelations,
+        amount: 123456, // 1234.56 PLN
+        offers: {
+          ...mockInvestmentWithRelations.offers,
+          target_amount: 5000000, // 50 000 PLN
+          minimum_investment: 50000, // 500 PLN
+        },
+      };
+
+      const mockQuery = {
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+        single: vi.fn().mockResolvedValue({
+          data: investmentWithVariousAmounts,
+          error: null,
+        }),
+      };
+
+      vi.mocked(mockSupabase.from).mockReturnValue(mockQuery as any);
+
+      const result = await investmentsService.getInvestmentDetails(investmentId, userId, false);
+
+      expect(result.amount).toBe(1234.56);
+      expect(result.offer.target_amount).toBe(50000);
+      expect(result.offer.minimum_investment).toBe(500);
+    });
+  });
 });

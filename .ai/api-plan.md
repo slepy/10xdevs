@@ -110,15 +110,26 @@
   - **Query Parameters:** `page`, `limit`, `status`
   - **Response:**
     - 200 OK: Investment records list.
+  
+- **Get Investment Details**
+  - **Method:** GET
+  - **URL:** `/api/investments/:investmentId`
+  - **Description:** Retrieves detailed information of a specific investment.
+  - **Response:**
+    - 200 OK: investment details
+    - 404 Not Found if not exists.
 
 - **Update Investment Status (Admin only)**
   - **Method:** PUT
   - **URL:** `/api/investments/:investmentId`
-  - **Description:** Admin can update investment status (e.g., accept, reject, close) based on business logic.
+  - **Description:** Admin can update investment status (e.g., accept, reject, close) based on business logic. if reject, reason needed
   - **Request Payload:**
 
     ```json
-    { "status": "accepted" | "rejected" | "closed" }
+    { 
+      "status": "accepted" | "rejected" | "closed",
+      "reason": string
+    }
     ```
 
   - **Response:**
@@ -129,6 +140,14 @@
   - **Method:** PUT
   - **URL:** `/api/investments/:investmentId/cancel`
   - **Description:** Allows a Signer to cancel a pending investment. Only allowed if status is `pending`.
+  - **Request Payload:**
+
+    ```json
+    { 
+      "reason": string
+    }
+    ```
+
   - **Response:**
     - 200 OK: Investment status updated to cancelled.
     - 400 Bad Request if investment cannot be cancelled.

@@ -47,3 +47,32 @@ export function getInvestmentStatusBadge(status: InvestmentStatus): InvestmentSt
 
   return config[status] || { variant: "secondary", label: status };
 }
+
+/**
+ * Zwraca dozwolone przejścia statusu dla inwestycji
+ * Używane zarówno w backendzie (walidacja) jak i frontendzie (UI)
+ *
+ * @param currentStatus - Aktualny status inwestycji
+ * @returns Tablica dozwolonych statusów do przejścia
+ *
+ * @example
+ * ```ts
+ * const allowed = getAllowedStatusTransitions(INVESTMENT_STATUSES.PENDING);
+ * // Returns: ['accepted', 'rejected', 'cancelled']
+ * ```
+ */
+export function getAllowedStatusTransitions(currentStatus: InvestmentStatus): InvestmentStatus[] {
+  const transitions: Record<InvestmentStatus, InvestmentStatus[]> = {
+    [INVESTMENT_STATUSES.PENDING]: [
+      INVESTMENT_STATUSES.ACCEPTED,
+      INVESTMENT_STATUSES.REJECTED,
+      INVESTMENT_STATUSES.CANCELLED,
+    ],
+    [INVESTMENT_STATUSES.ACCEPTED]: [INVESTMENT_STATUSES.COMPLETED],
+    [INVESTMENT_STATUSES.REJECTED]: [], // Status końcowy - brak możliwości zmiany
+    [INVESTMENT_STATUSES.CANCELLED]: [], // Status końcowy - brak możliwości zmiany
+    [INVESTMENT_STATUSES.COMPLETED]: [], // Status końcowy - brak możliwości zmiany
+  };
+
+  return transitions[currentStatus] || [];
+}

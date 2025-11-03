@@ -4,8 +4,7 @@ import { InvestmentsTable } from "./InvestmentsTable";
 import { TableSkeleton } from "./TableSkeleton";
 import { Pagination } from "../Pagination";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import type { InvestmentStatus, InvestmentWithOfferNameDTO } from "@/types";
-import type { InvestmentViewModel } from "./types";
+import type { InvestmentStatus, InvestmentWithOfferNameDTO, InvestmentViewModel } from "@/types";
 import { formatCurrency } from "@/lib/utils";
 
 /**

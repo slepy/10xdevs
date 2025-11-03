@@ -186,5 +186,45 @@ export const handlers = {
           { status }
         );
       }),
+
+    get: (response?: unknown, status = 200) =>
+      http.get("/api/investments/:id", () => {
+        return HttpResponse.json(
+          response || {
+            data: {
+              id: "1",
+              user_id: "1",
+              offer_id: "1",
+              amount: 5000,
+              status: "pending",
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString(),
+              completed_at: null,
+              reason: null,
+              deleted_at: null,
+              offer: {
+                id: "1",
+                name: "Test Offer",
+                description: "Test description",
+                target_amount: 100000,
+                minimum_investment: 1000,
+                status: "active",
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString(),
+                start_at: new Date().toISOString(),
+                end_at: new Date(Date.now() + 86400000).toISOString(),
+              },
+              user: {
+                id: "1",
+                email: "user@example.com",
+                firstName: "John",
+                lastName: "Doe",
+                role: "signer",
+              },
+            },
+          },
+          { status }
+        );
+      }),
   },
 };

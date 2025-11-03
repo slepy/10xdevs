@@ -2,7 +2,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/admin/EmptyState";
 import { getInvestmentStatusBadge } from "@/lib/investment-status";
-import type { InvestmentViewModel } from "./types";
+import type { InvestmentViewModel } from "@/types";
 
 interface InvestmentsTableProps {
   investments: InvestmentViewModel[];

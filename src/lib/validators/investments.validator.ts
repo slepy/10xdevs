@@ -50,3 +50,54 @@ export const investmentQuerySchema = z.object({
  * Typ wynikowy z walidacji parametrów zapytania
  */
 export type InvestmentQueryParams = z.infer<typeof investmentQuerySchema>;
+
+/**
+ * Dozwolone statusy dla aktualizacji przez administratora
+ */
+export const adminUpdateStatusValues = ["accepted", "rejected", "closed"] as const;
+
+/**
+ * Schema walidacji dla aktualizacji statusu inwestycji przez administratora
+ * Używany w PUT /api/investments/:investmentId
+ */
+export const updateInvestmentStatusSchema = z
+  .object({
+    status: z.enum(adminUpdateStatusValues, {
+      errorMap: () => ({ message: "Status musi być jednym z: accepted, rejected, closed" }),
+    }),
+    reason: z.string().min(1, "Powód jest wymagany").optional(),
+  })
+  .refine(
+    (data) => {
+      // Powód jest wymagany gdy status to "rejected"
+      if (data.status === "rejected" && !data.reason) {
+        return false;
+      }
+      return true;
+    },
+    {
+      message: "Powód odrzucenia jest wymagany dla statusu 'rejected'",
+      path: ["reason"],
+    }
+  );
+
+/**
+ * Typ wynikowy z walidacji aktualizacji statusu przez administratora
+ */
+export type UpdateInvestmentStatusInput = z.infer<typeof updateInvestmentStatusSchema>;
+
+/**
+ * Schema walidacji dla anulowania inwestycji przez użytkownika
+ * Używany w PUT /api/investments/:investmentId/cancel
+ */
+export const cancelInvestmentSchema = z.object({
+  reason: z
+    .string()
+    .min(10, "Powód anulowania musi mieć co najmniej 10 znaków")
+    .max(500, "Powód anulowania może mieć maksymalnie 500 znaków"),
+});
+
+/**
+ * Typ wynikowy z walidacji anulowania inwestycji
+ */
+export type CancelInvestmentInput = z.infer<typeof cancelInvestmentSchema>;

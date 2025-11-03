@@ -1,5 +1,10 @@
 import type { SupabaseClient } from "../../db/supabase.client";
-import type { CreateInvestmentInput, InvestmentQueryParams } from "../validators/investments.validator";
+import type {
+  CreateInvestmentInput,
+  InvestmentQueryParams,
+  UpdateInvestmentStatusInput,
+  CancelInvestmentInput,
+} from "../validators/investments.validator";
 import type {
   InvestmentDTO,
   InvestmentListResponse,
@@ -7,14 +12,28 @@ import type {
   InvestmentWithOfferNameDTO,
   InvestmentWithRelationsDTO,
   AdminInvestmentListResponse,
+  InvestmentDetailsDTO,
+  OfferDTO,
+  UserDTO,
+  InvestmentStatus,
 } from "../../types";
 import { INVESTMENT_STATUSES, OFFER_STATUSES } from "../../types";
 import { convertToSatoshi, convertFromSatoshi, formatCurrency } from "../utils";
+import { getAllowedStatusTransitions } from "../investment-status";
 
 /**
  * Serwis do zarządzania inwestycjami
  */
 export class InvestmentsService {
+  /**
+   * Mapowanie statusów admina (z API) na statusy systemowe (w bazie danych)
+   */
+  private static readonly STATUS_MAPPING: Record<string, string> = {
+    accepted: INVESTMENT_STATUSES.ACCEPTED,
+    rejected: INVESTMENT_STATUSES.REJECTED,
+    closed: INVESTMENT_STATUSES.COMPLETED,
+  };
+
   constructor(private supabase: SupabaseClient) {}
 
   /**
@@ -262,6 +281,259 @@ export class InvestmentsService {
         throw error;
       }
       throw new Error("Nieznany błąd podczas pobierania inwestycji dla admina");
+    }
+  }
+
+  /**
+   * Pobiera szczegółowe informacje o konkretnej inwestycji
+   * @param investmentId ID inwestycji do pobrania
+   * @param userId ID zalogowanego użytkownika
+   * @param isAdmin Czy użytkownik jest adminem
+   * @returns Szczegółowe dane inwestycji z powiązaną ofertą i użytkownikiem
+   * @throws Error jeśli inwestycja nie istnieje lub użytkownik nie ma dostępu
+   */
+  async getInvestmentDetails(investmentId: string, userId: string, isAdmin: boolean): Promise<InvestmentDetailsDTO> {
+    try {
+      // 1. Pobranie inwestycji z pełnymi danymi oferty i użytkownika
+      const { data: investment, error } = await this.supabase
+        .from("investments")
+        .select(
+          `
+          *,
+          offers(*),
+          users_view(id, email, role, first_name, last_name)
+        `
+        )
+        .eq("id", investmentId)
+        .single();
+
+      // 2. Sprawdzenie czy inwestycja istnieje
+      if (error || !investment) {
+        throw new Error("Inwestycja o podanym ID nie istnieje");
+      }
+
+      // 3. Sprawdzenie autoryzacji - czy użytkownik ma dostęp do tej inwestycji
+      if (!isAdmin && investment.user_id !== userId) {
+        throw new Error("Brak dostępu - nie masz uprawnień do przeglądania tej inwestycji");
+      }
+
+      // 4. Sprawdzenie czy dane relacji zostały pobrane
+      if (!investment.offers) {
+        throw new Error("Nie udało się pobrać danych oferty powiązanej z inwestycją");
+      }
+
+      if (!investment.users_view) {
+        throw new Error("Nie udało się pobrać danych użytkownika powiązanego z inwestycją");
+      }
+
+      // 5. Walidacja wymaganych pól użytkownika z users_view
+      if (!investment.users_view.id || !investment.users_view.email || !investment.users_view.role) {
+        throw new Error("Brakujące dane użytkownika w rekordzie inwestycji");
+      }
+
+      // 6. Konwersja kwot z centów na PLN
+      const investmentAmount = convertFromSatoshi(investment.amount);
+      const offerTargetAmount = convertFromSatoshi(investment.offers.target_amount);
+      const offerMinInvestment = convertFromSatoshi(investment.offers.minimum_investment);
+
+      // 7. Mapowanie danych użytkownika z users_view do UserDTO (konwersja snake_case na camelCase)
+      const userDTO: UserDTO = {
+        id: investment.users_view.id,
+        email: investment.users_view.email,
+        firstName: investment.users_view.first_name ?? undefined,
+        lastName: investment.users_view.last_name ?? undefined,
+        role: investment.users_view.role as "admin" | "signer",
+      };
+
+      // 8. Mapowanie danych oferty z konwersją kwot
+      const offerDTO: OfferDTO = {
+        ...investment.offers,
+        target_amount: offerTargetAmount,
+        minimum_investment: offerMinInvestment,
+      };
+
+      // 9. Zwrócenie pełnych danych inwestycji
+      return {
+        id: investment.id,
+        user_id: investment.user_id,
+        offer_id: investment.offer_id,
+        amount: investmentAmount,
+        status: investment.status,
+        created_at: investment.created_at,
+        updated_at: investment.updated_at,
+        completed_at: investment.completed_at,
+        reason: investment.reason,
+        deleted_at: investment.deleted_at,
+        offer: offerDTO,
+        user: userDTO,
+      };
+    } catch (error) {
+      // Re-throw z kontekstem
+      if (error instanceof Error) {
+        throw error;
+      }
+      throw new Error("Nieznany błąd podczas pobierania szczegółów inwestycji");
+    }
+  }
+
+  /**
+   * Aktualizuje status inwestycji (tylko dla adminów)
+   * @param investmentId ID inwestycji do zaktualizowania
+   * @param data Dane statusu po walidacji (status + opcjonalny reason)
+   * @returns Zaktualizowana inwestycja
+   * @throws Error jeśli inwestycja nie istnieje lub przejście statusu jest nieprawidłowe
+   */
+  async updateInvestmentStatus(investmentId: string, data: UpdateInvestmentStatusInput): Promise<InvestmentDTO> {
+    try {
+      // 1. Pobranie i walidacja istnienia inwestycji
+      const currentInvestment = await this.getInvestmentById(investmentId);
+
+      // 2. Walidacja przejścia statusu
+      this.validateStatusTransition(currentInvestment.status, data.status);
+
+      // 3. Mapowanie statusu admina na status systemowy
+      const mappedStatus = InvestmentsService.STATUS_MAPPING[data.status] || data.status;
+
+      // 4. Przygotowanie danych do aktualizacji
+      const updateData: {
+        status: string;
+        reason?: string | null;
+        completed_at?: string | null;
+        updated_at: string;
+      } = {
+        status: mappedStatus,
+        reason: data.reason ?? null,
+        updated_at: new Date().toISOString(),
+      };
+
+      // 5. Ustawienie completed_at dla statusu "completed" (closed z API)
+      if (mappedStatus === INVESTMENT_STATUSES.COMPLETED) {
+        updateData.completed_at = new Date().toISOString();
+      }
+
+      // 6. Aktualizacja w bazie danych
+      return await this.updateInvestmentInDatabase(investmentId, updateData);
+    } catch (error) {
+      if (error instanceof Error) {
+        throw error;
+      }
+      throw new Error("Nieznany błąd podczas aktualizacji statusu inwestycji");
+    }
+  }
+
+  /**
+   * Anuluje inwestycję przez użytkownika (tylko własną i tylko w statusie pending)
+   * @param investmentId ID inwestycji do anulowania
+   * @param userId ID zalogowanego użytkownika
+   * @param data Dane anulowania (reason)
+   * @returns Zaktualizowana inwestycja
+   * @throws Error jeśli inwestycja nie istnieje, użytkownik nie jest właścicielem lub status nie pozwala na anulowanie
+   */
+  async cancelInvestment(investmentId: string, userId: string, data: CancelInvestmentInput): Promise<InvestmentDTO> {
+    try {
+      // 1. Pobranie i walidacja istnienia inwestycji
+      const currentInvestment = await this.getInvestmentById(investmentId);
+
+      // 2. Sprawdzenie czy użytkownik jest właścicielem inwestycji
+      if (currentInvestment.user_id !== userId) {
+        throw new Error("Brak dostępu - możesz anulować tylko własne inwestycje");
+      }
+
+      // 3. Sprawdzenie czy inwestycja ma status "pending"
+      if (currentInvestment.status !== INVESTMENT_STATUSES.PENDING) {
+        throw new Error(
+          `Nie można anulować inwestycji ze statusem '${currentInvestment.status}'. Tylko inwestycje oczekujące mogą być anulowane.`
+        );
+      }
+
+      // 4. Przygotowanie danych do aktualizacji
+      const updateData = {
+        status: INVESTMENT_STATUSES.CANCELLED,
+        reason: data.reason,
+        updated_at: new Date().toISOString(),
+      };
+
+      // 5. Aktualizacja w bazie danych
+      return await this.updateInvestmentInDatabase(investmentId, updateData);
+    } catch (error) {
+      if (error instanceof Error) {
+        throw error;
+      }
+      throw new Error("Nieznany błąd podczas anulowania inwestycji");
+    }
+  }
+
+  /**
+   * Pobiera inwestycję po ID (metoda pomocnicza)
+   * @param investmentId ID inwestycji
+   * @returns Obiekt inwestycji z bazy danych
+   * @throws Error jeśli inwestycja nie istnieje
+   */
+  private async getInvestmentById(investmentId: string): Promise<InvestmentDTO> {
+    const { data: investment, error } = await this.supabase
+      .from("investments")
+      .select("*")
+      .eq("id", investmentId)
+      .single();
+
+    if (error || !investment) {
+      throw new Error("Inwestycja o podanym ID nie istnieje");
+    }
+
+    return investment;
+  }
+
+  /**
+   * Aktualizuje inwestycję w bazie danych (metoda pomocnicza)
+   * @param investmentId ID inwestycji do zaktualizowania
+   * @param updateData Dane do aktualizacji
+   * @returns Zaktualizowana inwestycja z konwersją kwoty
+   * @throws Error jeśli aktualizacja nie powiedzie się
+   */
+  private async updateInvestmentInDatabase(
+    investmentId: string,
+    updateData: {
+      status: string;
+      reason?: string | null;
+      completed_at?: string | null;
+      updated_at: string;
+    }
+  ): Promise<InvestmentDTO> {
+    const { data: updatedInvestment, error: updateError } = await this.supabase
+      .from("investments")
+      .update(updateData)
+      .eq("id", investmentId)
+      .select()
+      .single();
+
+    if (updateError || !updatedInvestment) {
+      throw new Error("Nie udało się zaktualizować inwestycji");
+    }
+
+    // Konwersja kwoty z centów na PLN przed zwróceniem
+    return {
+      ...updatedInvestment,
+      amount: convertFromSatoshi(updatedInvestment.amount),
+    };
+  }
+
+  /**
+   * Waliduje czy przejście statusu jest dozwolone
+   * @param currentStatus Aktualny status inwestycji
+   * @param newStatus Nowy status inwestycji
+   * @throws Error jeśli przejście nie jest dozwolone
+   */
+  private validateStatusTransition(currentStatus: string, newStatus: string): void {
+    // Mapowanie statusu admina na status systemowy
+    const mappedNewStatus = InvestmentsService.STATUS_MAPPING[newStatus] || newStatus;
+
+    // Sprawdzenie dozwolonych przejść (używamy wspólnej funkcji z investment-status.ts)
+    const allowedNextStatuses = getAllowedStatusTransitions(currentStatus as InvestmentStatus);
+
+    if (!allowedNextStatuses.includes(mappedNewStatus as InvestmentStatus)) {
+      throw new Error(
+        `Nieprawidłowe przejście statusu: nie można zmienić statusu z '${currentStatus}' na '${newStatus}'`
+      );
     }
   }
 }

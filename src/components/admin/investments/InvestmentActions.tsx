@@ -10,8 +10,8 @@ import {
 } from "@/components/ui/dialog";
 import { BaseButton } from "@/components/base";
 import { Badge } from "@/components/ui/badge";
-import { INVESTMENT_STATUSES, type InvestmentStatus } from "@/types";
-import { getInvestmentStatusBadge } from "@/lib/investment-status";
+import type { InvestmentStatus } from "@/types";
+import { getInvestmentStatusBadge, getAllowedStatusTransitions } from "@/lib/investment-status";
 
 interface InvestmentActionsProps {
   investmentId: string;
@@ -27,25 +27,8 @@ export function InvestmentActions({ investmentId, currentStatus, onStatusChange 
   const [selectedStatus, setSelectedStatus] = useState<InvestmentStatus | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  /**
-   * Zwraca dozwolone przejścia statusu
-   */
-  const getAllowedStatuses = (current: InvestmentStatus): InvestmentStatus[] => {
-    switch (current) {
-      case INVESTMENT_STATUSES.PENDING:
-        return [INVESTMENT_STATUSES.ACCEPTED, INVESTMENT_STATUSES.REJECTED];
-      case INVESTMENT_STATUSES.ACCEPTED:
-        return [INVESTMENT_STATUSES.COMPLETED, INVESTMENT_STATUSES.CANCELLED];
-      case INVESTMENT_STATUSES.REJECTED:
-      case INVESTMENT_STATUSES.CANCELLED:
-      case INVESTMENT_STATUSES.COMPLETED:
-        return []; // Finalne statusy - brak możliwości zmiany
-      default:
-        return [];
-    }
-  };
-
-  const allowedStatuses = getAllowedStatuses(currentStatus);
+  // Pobranie dozwolonych statusów z wspólnej funkcji (używanej też w backendzie)
+  const allowedStatuses = getAllowedStatusTransitions(currentStatus);
 
   /**
    * Obsługuje zmianę wartości w select
