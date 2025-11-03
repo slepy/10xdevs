@@ -8,6 +8,15 @@ const supabaseUrl = import.meta.env.SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.SUPABASE_KEY;
 const supabaseServiceRoleKey = import.meta.env.SUPABASE_SERVICE_ROLE_KEY;
 
+// Validate required environment variables
+if (!supabaseUrl || !supabaseAnonKey) {
+  throw new Error(
+    "Missing required Supabase environment variables. " +
+      "Please ensure SUPABASE_URL and SUPABASE_KEY are set. " +
+      "For Cloudflare Pages, add them in: Dashboard → Pages → Settings → Environment variables"
+  );
+}
+
 // Regular (client-side) Supabase client for non-request-specific usage.
 export const supabaseClient = createClient<Database>(supabaseUrl, supabaseAnonKey);
 
