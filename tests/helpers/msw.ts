@@ -120,6 +120,36 @@ export const handlers = {
                 status: "pending",
               },
             ],
+            pagination: {
+              page: 1,
+              limit: 10,
+              total: 1,
+              totalPages: 1,
+            },
+          },
+          { status }
+        );
+      }),
+
+    listInvestor: (response?: unknown, status = 200) =>
+      http.get("/api/investments/investor", () => {
+        return HttpResponse.json(
+          response || {
+            data: [
+              {
+                id: "1",
+                offer_id: "1",
+                user_id: "1",
+                amount: 10000,
+                status: "pending",
+              },
+            ],
+            pagination: {
+              page: 1,
+              limit: 10,
+              total: 1,
+              totalPages: 1,
+            },
           },
           { status }
         );

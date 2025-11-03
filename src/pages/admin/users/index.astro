@@ -1,6 +1,6 @@
 ---
 import AdminLayout from "../../../layouts/AdminLayout.astro";
-import PageHeader from "../../../components/admin/PageHeader.astro";
+import { BaseHeader } from "../../../components/base/BaseHeader";
 import { UsersTable } from "../../../components/admin/UsersTable";
 import { UsersService } from "../../../lib/services/users.service";
 import type { UserDTO } from "../../../types";
@@ -24,7 +24,7 @@ try {
 ---
 
 <AdminLayout title="Użytkownicy">
-  <PageHeader title="Użytkownicy" />
+  <BaseHeader title="Użytkownicy" client:only="react" />
 
   {
     error ? (

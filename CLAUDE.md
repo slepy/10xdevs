@@ -426,5 +426,5 @@ Key entities:
 
 Statuses:
 
-- Offer: `draft`, `active`, `closed`, `completed`
+- Offer: `draft`, `active`, `closed`
 - Investment: `pending`, `accepted`, `rejected`, `cancelled`, `completed`

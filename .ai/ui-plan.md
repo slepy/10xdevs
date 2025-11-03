@@ -68,7 +68,7 @@ System interfejsu użytkownika został zaprojektowany jako zestaw spójnych wido
 
 ### 2.6. Moje inwestycje (User Signer)
 
-- **Ścieżka widoku:** `/my-investments`
+- **Ścieżka widoku:** `/investments`
 
 - **Główny cel:** Umożliwienie użytkownikom śledzenia statusu ich inwestycji oraz składania nowych deklaracji.
 

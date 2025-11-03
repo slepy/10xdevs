@@ -1,0 +1,34 @@
+---
+import AuthenticatedLayout from "../../layouts/AuthenticatedLayout.astro";
+import { OfferDetailsPage } from "../../components/OfferDetailsPage";
+import { requireAuth } from "../../lib/auth/protection";
+import { isFeatureEnabled } from "../../features";
+
+export const prerender = false;
+
+// Check if offer-details feature is enabled
+if (!isFeatureEnabled("offer-details")) {
+  return Astro.redirect("/offers");
+}
+
+// Require authentication - will redirect to login if not authenticated
+const user = requireAuth(Astro);
+
+// Get offerId from params
+const { offerId } = Astro.params;
+
+// Verify offerId exists
+if (!offerId) {
+  return Astro.redirect("/offers");
+}
+
+// Breadcrumbs for navigation
+const breadcrumbs = [
+  { label: "Oferty", href: "/offers" },
+  { label: "Szczegóły oferty", href: `/offers/${offerId}` },
+];
+---
+
+<AuthenticatedLayout title="Szczegóły oferty - BlindInvest" breadcrumbs={breadcrumbs}>
+  <OfferDetailsPage offerId={offerId} userRole={user.role} client:load />
+</AuthenticatedLayout>

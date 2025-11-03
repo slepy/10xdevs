@@ -1,33 +1,29 @@
 ---
 import AdminLayout from "../../../layouts/AdminLayout.astro";
-import PageHeader from "../../../components/admin/PageHeader.astro";
-import { OffersService } from "../../../lib/services/offers.service";
-import { BaseButton } from "../../../components/base";
+import { BaseButton, BaseHeader } from "../../../components/base";
+import { OffersTable } from "../../../components/admin/OffersTable";
+import type { ApiResponse, OfferDTO } from "../../../types";
 
-const { supabase } = Astro.locals;
-const offersService = new OffersService(supabase);
-const offers = await offersService.getOffers();
+// Fetch offers from API endpoint instead of direct service call
+const response = await fetch(`${Astro.url.origin}/api/offers`, {
+  headers: {
+    Cookie: Astro.request.headers.get("Cookie") || "",
+  },
+});
+
+let offers: OfferDTO[] = [];
+
+if (response.ok) {
+  const data = (await response.json()) as ApiResponse<OfferDTO[]>;
+  offers = data.data || [];
+}
+// If response fails, offers will remain empty array
 ---
 
 <AdminLayout title="Zarządzaj Ofertami">
-  <PageHeader title="Zarządzaj Ofertami">
-    <a slot="actions" href="/admin/offers/create">
-      <BaseButton>Dodaj nową ofertę</BaseButton>
-    </a>
-  </PageHeader>
+  <BaseHeader title="Zarządzaj Ofertami" client:only="react">
+    <BaseButton href="/admin/offers/create">Dodaj nową ofertę</BaseButton>
+  </BaseHeader>
 
-  {
-    offers.length === 0 ? (
-      <div class="flex flex-col items-center justify-center text-center p-10 border-2 border-dashed rounded-lg">
-        <p class="text-lg font-semibold text-gray-500">Brak dostępnych ofert.</p>
-        <p class="text-gray-400 mt-2">Dodaj pierwszą, aby rozpocząć.</p>
-      </div>
-    ) : (
-      <ul>
-        {offers.map((offer) => (
-          <li>{offer.name}</li>
-        ))}
-      </ul>
-    )
-  }
+  <OffersTable offers={offers} client:load />
 </AdminLayout>

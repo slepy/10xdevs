@@ -439,7 +439,9 @@ describe("AuthService", () => {
         error: { message: "API Error", name: "AuthError", status: 500 },
       } as never);
 
-      await expect(authService.listUsers({ page: 1, limit: 10 })).rejects.toThrow("Błąd podczas pobierania użytkowników");
+      await expect(authService.listUsers({ page: 1, limit: 10 })).rejects.toThrow(
+        "Błąd podczas pobierania użytkowników"
+      );
     });
 
     it("should handle combined filter and sort", async () => {

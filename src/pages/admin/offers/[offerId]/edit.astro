@@ -1,0 +1,38 @@
+---
+import AdminLayout from "../../../../layouts/AdminLayout.astro";
+import EditOfferForm from "../../../../components/forms/EditOfferForm";
+import { BaseHeader } from "../../../../components/base/BaseHeader";
+import { OffersService } from "../../../../lib/services/offers.service";
+import type { OfferWithImagesDTO } from "../../../../types";
+
+export const prerender = false;
+
+// AdminLayout automatically checks for admin role
+
+// Get offerId from URL params
+const { offerId } = Astro.params;
+
+if (!offerId) {
+  return Astro.redirect("/admin/offers");
+}
+
+// Fetch offer data
+let offer: OfferWithImagesDTO;
+
+try {
+  const offersService = new OffersService(Astro.locals.supabase);
+  offer = await offersService.getOfferById(offerId);
+} catch (error) {
+  // eslint-disable-next-line no-console
+  console.error("Error fetching offer:", error);
+  // If offer not found, redirect to offers list
+  return Astro.redirect("/admin/offers");
+}
+---
+
+<AdminLayout title={`Edytuj ofertę: ${offer.name}`}>
+  <div class="max-w-2xl">
+    <BaseHeader title="Edytuj ofertę" client:only="react" />
+    <EditOfferForm client:load offerId={offerId} initialData={offer} />
+  </div>
+</AdminLayout>

@@ -111,9 +111,7 @@ export function Navigation({ user, currentPath = "", variant }: NavigationProps)
   const getLinkClasses = (href: string) => {
     const baseClasses = "px-4 py-2 rounded-lg text-sm font-medium transition-colors";
     if (isActive(href)) {
-      return isAdminVariant
-        ? `${baseClasses} bg-gray-800 text-white`
-        : `${baseClasses} bg-blue-50 text-blue-600`;
+      return isAdminVariant ? `${baseClasses} bg-gray-800 text-white` : `${baseClasses} bg-blue-50 text-blue-600`;
     }
     return isAdminVariant
       ? `${baseClasses} text-gray-300 hover:bg-gray-800 hover:text-white`

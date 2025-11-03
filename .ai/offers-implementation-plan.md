@@ -21,6 +21,7 @@ Endpoint służy do tworzenia nowych ofert inwestycyjnych w systemie. Jest dost�
 
 - **Opcjonalne:**
   - `description` (string) - Opis oferty
+  - `images` (string[]) - Tablica URL-i obrazów (maksymalnie 5 obrazów)
 
 - **Automatycznie generowane:**
   - `status` - Status oferty (domyślnie "draft")
@@ -35,7 +36,11 @@ Endpoint służy do tworzenia nowych ofert inwestycyjnych w systemie. Jest dost�
   "description": "Inwestycja w innowacyjny startup technologiczny",
   "target_amount": 100000,
   "minimum_investment": 1000,
-  "end_at": "2025-12-31T23:59:59Z"
+  "end_at": "2025-12-31T23:59:59Z",
+  "images": [
+    "https://example.supabase.co/storage/v1/object/public/offer-images/uuid-1.jpg",
+    "https://example.supabase.co/storage/v1/object/public/offer-images/uuid-2.jpg"
+  ]
 }
 ```
 
@@ -56,6 +61,7 @@ const createOfferSchema = z.object({
   target_amount: z.number().positive("Docelowa kwota musi być większa od 0"),
   minimum_investment: z.number().positive("Minimalna inwestycja musi być większa od 0"),
   end_at: z.string().datetime("Nieprawidłowy format daty"),
+  images: z.array(z.string().url("Nieprawidłowy URL obrazu")).max(5, "Maksymalnie 5 obrazów").optional(),
 });
 ```
 
@@ -73,6 +79,10 @@ const createOfferSchema = z.object({
     "minimum_investment": 100000,
     "end_at": "2025-12-31T23:59:59.000Z",
     "status": "draft",
+    "images": [
+      "https://example.supabase.co/storage/v1/object/public/offer-images/uuid-1.jpg",
+      "https://example.supabase.co/storage/v1/object/public/offer-images/uuid-2.jpg"
+    ],
     "created_at": "2025-10-09T12:00:00.000Z",
     "updated_at": "2025-10-09T12:00:00.000Z"
   }
@@ -146,6 +156,8 @@ POST /api/offers
 | Nieprawidłowy format daty    | 400 | Invalid datetime format for end_at field           |
 | Ujemne kwoty                 | 400 | Amounts must be positive numbers                   |
 | Nazwa zbyt długa             | 400 | Name exceeds 255 characters limit                  |
+| Za dużo obrazów              | 400 | Maximum 5 images allowed per offer                 |
+| Nieprawidłowy URL obrazu     | 400 | Invalid image URL format                           |
 | Błąd bazy danych             | 500 | Database connection or constraint error            |
 | Nieoczekiwany błąd           | 500 | Internal server error                              |
 

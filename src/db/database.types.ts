@@ -65,6 +65,13 @@ export interface Database {
             referencedRelation: "offers";
             referencedColumns: ["id"];
           },
+          {
+            foreignKeyName: "investments_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "users_view";
+            referencedColumns: ["id"];
+          },
         ];
       };
       notifications: {
@@ -92,7 +99,50 @@ export interface Database {
           updated_at?: string;
           user_id?: string;
         };
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: "notifications_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "users_view";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      offer_images: {
+        Row: {
+          created_at: string;
+          display_order: number;
+          id: string;
+          offer_id: string;
+          updated_at: string;
+          url: string;
+        };
+        Insert: {
+          created_at?: string;
+          display_order?: number;
+          id?: string;
+          offer_id: string;
+          updated_at?: string;
+          url: string;
+        };
+        Update: {
+          created_at?: string;
+          display_order?: number;
+          id?: string;
+          offer_id?: string;
+          updated_at?: string;
+          url?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "offer_images_offer_id_fkey";
+            columns: ["offer_id"];
+            isOneToOne: false;
+            referencedRelation: "offers";
+            referencedColumns: ["id"];
+          },
+        ];
       };
       offers: {
         Row: {
@@ -131,8 +181,38 @@ export interface Database {
         Relationships: [];
       };
     };
-    Views: Record<never, never>;
-    Functions: Record<never, never>;
+    Views: {
+      users_view: {
+        Row: {
+          email: string | null;
+          first_name: string | null;
+          id: string | null;
+          last_name: string | null;
+          role: string | null;
+        };
+        Insert: {
+          email?: string | null;
+          first_name?: never;
+          id?: string | null;
+          last_name?: never;
+          role?: never;
+        };
+        Update: {
+          email?: string | null;
+          first_name?: never;
+          id?: string | null;
+          last_name?: never;
+          role?: never;
+        };
+        Relationships: [];
+      };
+    };
+    Functions: {
+      update_user_metadata: {
+        Args: { metadata: Json; user_id: string };
+        Returns: Json;
+      };
+    };
     Enums: Record<never, never>;
     CompositeTypes: Record<never, never>;
   };

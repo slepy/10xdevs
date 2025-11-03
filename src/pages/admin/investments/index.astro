@@ -1,8 +1,10 @@
 ---
 import AdminLayout from "../../../layouts/AdminLayout.astro";
-import PageHeader from "../../../components/admin/PageHeader.astro";
+import { BaseHeader } from "../../../components/base/BaseHeader";
+import { AdminInvestmentsView } from "../../../components/admin/investments/AdminInvestmentsView";
 ---
 
 <AdminLayout title="Zarządzanie Inwestycjami">
-  <PageHeader title="Zarządzanie Inwestycjami" />
+  <BaseHeader title="Zarządzanie Inwestycjami" client:only="react" />
+  <AdminInvestmentsView client:only="react" />
 </AdminLayout>

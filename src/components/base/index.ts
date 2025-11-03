@@ -10,3 +10,4 @@ export { BaseTextarea, type BaseTextareaProps } from "./BaseTextarea";
 export { BaseLabel, type BaseLabelProps } from "./BaseLabel";
 export { BaseAlert, type BaseAlertProps } from "./BaseAlert";
 export { BaseFormField, type BaseFormFieldProps } from "./BaseFormField";
+export { BaseHeader } from "./BaseHeader";

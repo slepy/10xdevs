@@ -52,6 +52,14 @@ export interface ListQueryParams {
 export type CreateOfferDTO = Omit<TablesInsert<"offers">, "id" | "created_at" | "updated_at" | "status">;
 
 /**
+ * Request body for creating a new offer with images
+ * Extends CreateOfferDTO with images array
+ */
+export interface CreateOfferWithImagesDTO extends CreateOfferDTO {
+  images?: string[];
+}
+
+/**
  * DTO for updating an existing offer (PUT /api/offers/:offerId)
  * All fields are optional for partial updates, excluding status which has dedicated endpoint
  */
@@ -71,9 +79,23 @@ export interface UpdateOfferStatusDTO {
 export type OfferDTO = Tables<"offers">;
 
 /**
+ * Offer data with images array
+ * Used when fetching offers with their associated images
+ */
+export interface OfferWithImagesDTO extends OfferDTO {
+  images?: string[];
+}
+
+/**
  * Response for offers list endpoint (GET /api/offers)
  */
 export type OfferListResponse = PaginatedResponse<OfferDTO>;
+
+/**
+ * Response for available offers endpoint (GET /api/offers/available)
+ * Includes images array for each offer
+ */
+export type AvailableOffersResponse = PaginatedResponse<OfferWithImagesDTO>;
 
 /**
  * Query parameters for offers list endpoint
@@ -112,6 +134,12 @@ export type InvestmentDTO = Tables<"investments">;
  * Response for investments list endpoint (GET /api/investments)
  */
 export type InvestmentListResponse = PaginatedResponse<InvestmentDTO>;
+
+/**
+ * Response for user investments list endpoint (GET /api/investments/user)
+ * Includes simplified offer details (name only)
+ */
+export type UserInvestmentListResponse = PaginatedResponse<InvestmentWithOfferNameDTO>;
 
 /**
  * Query parameters for investments list endpoint
@@ -291,7 +319,6 @@ export const OFFER_STATUSES = {
   DRAFT: "draft",
   ACTIVE: "active",
   CLOSED: "closed",
-  COMPLETED: "completed",
 } as const;
 
 /**
@@ -324,6 +351,39 @@ export interface InvestmentWithOfferDTO extends InvestmentDTO {
 }
 
 /**
+ * Extended investment data with simplified offer details
+ * Used for investment list views (e.g., "My Investments")
+ */
+export interface InvestmentWithOfferNameDTO extends InvestmentDTO {
+  offers: {
+    name: string;
+  } | null;
+}
+
+/**
+ * Extended investment data with offer and user details
+ * Used for admin investment list views
+ */
+export interface InvestmentWithRelationsDTO extends InvestmentDTO {
+  offers: {
+    name: string;
+  } | null;
+  users_view: {
+    id: string;
+    email: string;
+    role: string;
+    first_name: string;
+    last_name: string;
+  } | null;
+}
+
+/**
+ * Response for admin investments list endpoint (GET /api/investments/admin)
+ * Includes offer and user data for each investment
+ */
+export type AdminInvestmentListResponse = PaginatedResponse<InvestmentWithRelationsDTO>;
+
+/**
  * Investment summary for dashboard views
  */
 export interface InvestmentSummaryDTO {
@@ -331,4 +391,33 @@ export interface InvestmentSummaryDTO {
   total_amount: number;
   pending_investments: number;
   completed_investments: number;
+}
+
+/**
+ * Simplified view model for offer card display
+ * Contains formatted data for UI presentation
+ */
+export interface OfferViewModel {
+  id: string;
+  name: string;
+  target_amount: string;
+  min_investment: string;
+  main_image_url?: string;
+}
+
+/**
+ * View model for offer details page
+ * Contains formatted data ready for display in components
+ */
+export interface OfferDetailsViewModel {
+  id: string;
+  name: string;
+  status: OfferStatus;
+  description: string;
+  images: string[];
+  // Formatted financial values (converted from cents)
+  target_amount: string; // e.g., "500 000,00 zł"
+  minimum_investment: string; // e.g., "1 000,00 zł"
+  // Raw numeric values for form validation and business logic
+  minimum_investment_raw: number; // Raw value in PLN (already converted from cents by backend)
 }

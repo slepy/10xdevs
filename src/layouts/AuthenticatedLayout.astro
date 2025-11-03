@@ -8,7 +8,7 @@ interface Props {
   title?: string;
   description?: string;
   showSidebar?: boolean;
-  breadcrumbs?: Array<{ label: string; href: string }>;
+  breadcrumbs?: { label: string; href: string }[];
 }
 
 // Require authentication - will redirect to login if not authenticated

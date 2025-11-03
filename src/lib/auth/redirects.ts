@@ -27,7 +27,7 @@ export function buildRedirectUrl(targetPath: string, returnPath?: string): strin
  * @param defaultPath - Default path if no redirect param found
  * @returns Sanitized redirect path or default
  */
-export function getRedirectTarget(url: URL, defaultPath: string = "/"): string {
+export function getRedirectTarget(url: URL, defaultPath = "/"): string {
   const redirectParam = url.searchParams.get("redirect");
 
   if (!redirectParam) {

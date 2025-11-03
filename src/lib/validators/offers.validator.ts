@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { OFFER_STATUSES } from "../../types";
 
 /**
  * Schema walidacji dla tworzenia nowej oferty
@@ -21,11 +22,18 @@ export const createOfferSchema = z
       .max(100000000, "Minimalna inwestycja jest zbyt duża"), // 1 mln PLN
 
     end_at: z
-      .date({
-        required_error: "Data zakończenia jest wymagana",
-        invalid_type_error: "Nieprawidłowy format daty",
-      })
-      .min(new Date(), { message: "Data nie może być z przeszłości" }),
+      .string()
+      .min(1, "Data zakończenia jest wymagana")
+      .refine(
+        (val) => {
+          // Akceptuj format datetime-local (YYYY-MM-DDTHH:mm) lub ISO 8601
+          const date = new Date(val);
+          return !isNaN(date.getTime());
+        },
+        { message: "Nieprawidłowy format daty" }
+      ),
+
+    images: z.array(z.string().url("Nieprawidłowy URL obrazu")).max(5, "Możesz dodać maksymalnie 5 obrazów").optional(),
   })
   .refine(
     (data) => {
@@ -34,6 +42,16 @@ export const createOfferSchema = z
     {
       message: "Minimalna inwestycja nie może być większa niż docelowa kwota",
       path: ["minimum_investment"],
+    }
+  )
+  .refine(
+    (data) => {
+      const endDate = new Date(data.end_at);
+      return endDate > new Date();
+    },
+    {
+      message: "Data zakończenia nie może być w przeszłości",
+      path: ["end_at"],
     }
   );
 
@@ -46,4 +64,30 @@ export type CreateOfferInput = z.infer<typeof createOfferSchema>;
  * Typ reprezentujący dane formularza w komponencie React
  * Zgodny ze schematem walidacji Zod
  */
-export type CreateOfferViewModel = z.infer<typeof createOfferSchema>;
+export type CreateOfferViewModel = CreateOfferInput;
+
+/**
+ * Schema walidacji dla aktualizacji statusu oferty
+ */
+export const updateOfferStatusSchema = z.object({
+  status: z.enum([OFFER_STATUSES.DRAFT, OFFER_STATUSES.ACTIVE, OFFER_STATUSES.CLOSED], {
+    errorMap: () => ({ message: "Nieprawidłowy status oferty" }),
+  }),
+});
+
+/**
+ * Typ wynikowy z walidacji dla aktualizacji statusu
+ */
+export type UpdateOfferStatusInput = z.infer<typeof updateOfferStatusSchema>;
+
+/**
+ * Schema walidacji dla aktualizacji oferty (PUT)
+ * Używa tego samego schematu co tworzenie - wszystkie pola wymagane
+ * Formularz edycji jest identyczny jak formularz tworzenia
+ */
+export const updateOfferSchema = createOfferSchema;
+
+/**
+ * Typ wynikowy z walidacji dla aktualizacji oferty
+ */
+export type UpdateOfferInput = z.infer<typeof updateOfferSchema>;

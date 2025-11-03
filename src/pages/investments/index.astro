@@ -1,0 +1,15 @@
+---
+import AuthenticatedLayout from "../../layouts/AuthenticatedLayout.astro";
+import { InvestmentsView } from "../../components/investments/InvestmentsView";
+
+export const prerender = false;
+
+// AuthenticatedLayout automatically requires authentication
+// Only SIGNER role users should access this page
+---
+
+<AuthenticatedLayout title="Moje Inwestycje - BlindInvest">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <InvestmentsView client:load />
+  </div>
+</AuthenticatedLayout>

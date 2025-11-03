@@ -1,6 +1,7 @@
 ---
 import AuthenticatedLayout from "../../layouts/AuthenticatedLayout.astro";
 import { isFeatureEnabled } from "../../features";
+import { OffersPage } from "../../components/OffersPage";
 
 export const prerender = false;
 
@@ -13,14 +14,7 @@ if (!isFeatureEnabled("offers-list")) {
 ---
 
 <AuthenticatedLayout title="Oferty - BlindInvest">
-  <div class="max-w-6xl mx-auto">
-    <div class="mb-8">
-      <h1 class="text-3xl font-bold text-gray-900 mb-2">Oferty inwestycyjne</h1>
-      <p class="text-gray-600">Przeglądaj dostępne oferty i wybierz najlepszą dla siebie</p>
-    </div>
-
-    <div class="bg-white rounded-lg shadow-md p-8">
-      <p class="text-gray-600 text-center">Tutaj będą wyświetlane dostępne oferty inwestycyjne.</p>
-    </div>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <OffersPage client:load />
   </div>
 </AuthenticatedLayout>

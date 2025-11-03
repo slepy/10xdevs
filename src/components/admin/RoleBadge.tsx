@@ -13,9 +13,5 @@ interface RoleBadgeProps {
 export function RoleBadge({ role }: RoleBadgeProps) {
   const isAdmin = role === USER_ROLES.ADMIN;
 
-  return (
-    <Badge variant={isAdmin ? "destructive" : "default"}>
-      {isAdmin ? "Administrator" : "Inwestor"}
-    </Badge>
-  );
+  return <Badge variant={isAdmin ? "destructive" : "default"}>{isAdmin ? "Administrator" : "Inwestor"}</Badge>;
 }

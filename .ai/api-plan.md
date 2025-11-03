@@ -50,6 +50,15 @@
   - **Response:**
     - 200 OK: `{ "offers": [...], "pagination": { "page": number, "limit": number, "total": number } }`
 
+- **List Available Offers for Investment**
+  - **Method:** GET
+  - **URL:** `/api/offers/available`
+  - **Description:** Retrieves a paginated list of offers available for investment. Returns only offers with status `active` and where `end_at` date is in the future (later than current time).
+  - **Query Parameters:** `page`, `limit`, `sort`
+  - **Response:**
+    - 200 OK: `{ "offers": [...], "pagination": { "page": number, "limit": number, "total": number } }`
+  - **Note:** Public endpoint - no authentication required. Automatically filters out expired or non-active offers.
+
 - **Get Offer Details**
   - **Method:** GET
   - **URL:** `/api/offers/:offerId`

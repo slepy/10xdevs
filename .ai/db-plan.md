@@ -27,6 +27,7 @@
 - **created_at**: TIMESTAMPTZ NOT NULL DEFAULT now()
 - **status**: VARCHAR(50) NOT NULL -- np. 'pending', 'accepted', 'rejected', 'closed'
 - **completed_at**: TIMESTAMPTZ NULLABLE -- opcjonalne
+- **reason**: TEXT
 
 **Indeksy:**
 

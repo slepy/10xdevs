@@ -16,7 +16,7 @@
 
 export type Environment = "development" | "production" | "test";
 
-export type FeatureName = "auth" | "offers-list" | "offers-create";
+export type FeatureName = "auth" | "offers-list" | "offers-create" | "offer-details";
 
 export type EnvironmentConfig = Record<Environment, boolean>;
 
@@ -40,6 +40,11 @@ export const features: FeaturesConfig = {
     test: true,
   },
   "offers-create": {
+    development: true,
+    production: true,
+    test: true,
+  },
+  "offer-details": {
     development: true,
     production: true,
     test: true,

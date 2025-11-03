@@ -1,6 +1,7 @@
 ---
 import AdminLayout from "../../../layouts/AdminLayout.astro";
 import CreateOfferForm from "../../../components/forms/CreateOfferForm.tsx";
+import { BaseHeader } from "../../../components/base/BaseHeader";
 
 export const prerender = false;
 
@@ -9,13 +10,7 @@ export const prerender = false;
 
 <AdminLayout title="Utwórz nową ofertę">
   <div class="max-w-2xl">
-    <div class="mb-8">
-      <h1 class="text-3xl font-bold text-gray-900 mb-2">Utwórz nową ofertę</h1>
-      <p class="text-gray-600">Wypełnij formularz poniżej, aby utworzyć nową ofertę inwestycyjną.</p>
-    </div>
-
-    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-      <CreateOfferForm client:load />
-    </div>
+    <BaseHeader title="Utwórz nową ofertę" client:only="react" />
+    <CreateOfferForm client:load />
   </div>
 </AdminLayout>
