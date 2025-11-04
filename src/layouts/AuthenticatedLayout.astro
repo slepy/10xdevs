@@ -1,7 +1,6 @@
 ---
 import BaseLayout from "./BaseLayout.astro";
 import Navigation from "../components/Navigation.astro";
-import UserSidebar from "../components/UserSidebar.astro";
 import { requireAuth } from "../lib/auth/protection";
 
 interface Props {
@@ -14,7 +13,7 @@ interface Props {
 // Require authentication - will redirect to login if not authenticated
 const user = requireAuth(Astro);
 
-const { showSidebar = false, breadcrumbs, ...rest } = Astro.props;
+const { breadcrumbs, ...rest } = Astro.props;
 ---
 
 <BaseLayout {...rest}>
@@ -22,16 +21,6 @@ const { showSidebar = false, breadcrumbs, ...rest } = Astro.props;
     <Navigation user={user} currentPath={Astro.url.pathname} variant="authenticated" />
 
     <div class="flex flex-1">
-      {
-        showSidebar && (
-          <aside class="hidden md:flex md:w-64 md:flex-col bg-white border-r border-gray-200" data-testid="sidebar">
-            <slot name="sidebar">
-              <UserSidebar user={user} currentPath={Astro.url.pathname} />
-            </slot>
-          </aside>
-        )
-      }
-
       <main class="flex-1 px-4 py-8 md:px-8" data-testid="main-content">
         {
           breadcrumbs && breadcrumbs.length > 0 && (
