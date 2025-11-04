@@ -67,8 +67,55 @@ export const updateUserSchema = z.object({
 });
 
 /**
+ * Schema walidacji dla zmiany hasła (dla formularza - z confirmNewPassword)
+ */
+export const changePasswordSchema = z
+  .object({
+    currentPassword: z.string().min(1, "Aktualne hasło jest wymagane"),
+    newPassword: z
+      .string()
+      .min(1, "Nowe hasło jest wymagane")
+      .min(8, "Hasło musi mieć minimum 8 znaków")
+      .max(128, "Hasło może mieć maksymalnie 128 znaków")
+      .regex(/[A-Z]/, "Hasło musi zawierać co najmniej jedną wielką literę")
+      .regex(/[0-9]/, "Hasło musi zawierać co najmniej jedną cyfrę")
+      .regex(/[!@#$%^&*(),.?":{}|<>]/, "Hasło musi zawierać co najmniej jeden znak specjalny"),
+    confirmNewPassword: z.string().min(1, "Potwierdzenie nowego hasła jest wymagane"),
+  })
+  .refine((data) => data.newPassword === data.confirmNewPassword, {
+    message: "Nowe hasła muszą być identyczne",
+    path: ["confirmNewPassword"],
+  })
+  .refine((data) => data.currentPassword !== data.newPassword, {
+    message: "Nowe hasło musi być różne od aktualnego hasła",
+    path: ["newPassword"],
+  });
+
+/**
+ * Schema walidacji dla zmiany hasła (tylko dla API - bez confirmNewPassword)
+ */
+export const changePasswordApiSchema = z
+  .object({
+    currentPassword: z.string().min(1, "Aktualne hasło jest wymagane"),
+    newPassword: z
+      .string()
+      .min(1, "Nowe hasło jest wymagane")
+      .min(8, "Hasło musi mieć minimum 8 znaków")
+      .max(128, "Hasło może mieć maksymalnie 128 znaków")
+      .regex(/[A-Z]/, "Hasło musi zawierać co najmniej jedną wielką literę")
+      .regex(/[0-9]/, "Hasło musi zawierać co najmniej jedną cyfrę")
+      .regex(/[!@#$%^&*(),.?":{}|<>]/, "Hasło musi zawierać co najmniej jeden znak specjalny"),
+  })
+  .refine((data) => data.currentPassword !== data.newPassword, {
+    message: "Nowe hasło musi być różne od aktualnego hasła",
+    path: ["newPassword"],
+  });
+
+/**
  * Typy inferred z schematów walidacji
  */
 export type LoginFormData = z.infer<typeof loginSchema>;
 export type RegisterFormData = z.infer<typeof registerSchema>;
 export type UpdateUserFormData = z.infer<typeof updateUserSchema>;
+export type ChangePasswordFormData = z.infer<typeof changePasswordSchema>;
+export type ChangePasswordApiData = z.infer<typeof changePasswordApiSchema>;

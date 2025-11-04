@@ -97,6 +97,7 @@ The current MVP of BlindInvest includes:
 - **Offer Management**: Administrators can create, edit, and manage investment offers.
 - **Investment Process**: Investors can browse offers and submit investment declarations.
 - **Investment Tracking**: Both investors and administrators can monitor the status of investments.
+- **Investment Management**: Administrators can reject or approve pending investments. Can complete approved investment.
 - **Document Management**: Administrators can attach and manage documents related to investments.
 
 ## Project Status

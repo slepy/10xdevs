@@ -108,6 +108,39 @@ export class AuthService {
   }
 
   /**
+   * Zmienia hasło użytkownika
+   * @param currentPassword Aktualne hasło
+   * @param newPassword Nowe hasło
+   */
+  async changePassword(currentPassword: string, newPassword: string): Promise<void> {
+    // Najpierw weryfikujemy aktualne hasło poprzez próbę logowania
+    const { data: currentUser } = await this.supabase.auth.getUser();
+
+    if (!currentUser.user?.email) {
+      throw new Error("Nie można zidentyfikować użytkownika");
+    }
+
+    // Weryfikacja aktualnego hasła poprzez próbę logowania
+    const { error: verifyError } = await this.supabase.auth.signInWithPassword({
+      email: currentUser.user.email,
+      password: currentPassword,
+    });
+
+    if (verifyError) {
+      throw new Error("Aktualne hasło jest nieprawidłowe");
+    }
+
+    // Jeśli weryfikacja się udała, aktualizujemy hasło
+    const { error: updateError } = await this.supabase.auth.updateUser({
+      password: newPassword,
+    });
+
+    if (updateError) {
+      throw this.handleAuthError(updateError.message);
+    }
+  }
+
+  /**
    * Mapuje dane użytkownika z Supabase Auth do DTO
    * @param user Użytkownik z Supabase Auth
    * @returns UserDTO

@@ -1,5 +1,245 @@
-<div
-  class="relative w-full mx-auto min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-blue-900 p-4 sm:p-8"
+---
+// Komponent strony powitalnej BlindInvest
+---
+
+<!-- Hero Section -->
+<section
+  class="relative bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-700 text-white overflow-hidden"
+  data-testid="hero-section"
 >
-  strona glowna
-</div>
+  <div class="absolute inset-0 bg-black/20"></div>
+  <div class="relative container mx-auto px-4 py-20 lg:py-32">
+    <div class="max-w-4xl mx-auto text-center">
+      <h1 class="text-4xl md:text-6xl font-bold mb-6 leading-tight" data-testid="hero-title">
+        Inwestuj mądrze z
+        <span class="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent"> BlindInvest </span>
+      </h1>
+      <p class="text-xl md:text-2xl mb-8 text-blue-100 leading-relaxed" data-testid="hero-subtitle">
+        Platforma agregująca najlepsze oferty inwestycyjne z wielu źródeł. Znajdź swoją szansę na zysk bez konieczności
+        przeszukiwania całego internetu.
+      </p>
+      <div class="flex flex-col sm:flex-row gap-4 justify-center items-center" data-testid="hero-cta">
+        <a
+          href="/register"
+          class="px-8 py-4 bg-white text-blue-600 font-semibold rounded-lg hover:bg-gray-50 transition-colors shadow-lg hover:shadow-xl transform hover:-translate-y-1 duration-200"
+          data-testid="hero-register-button"
+        >
+          Rozpocznij inwestowanie
+        </a>
+        <a
+          href="/offers"
+          class="px-8 py-4 border-2 border-white text-white font-semibold rounded-lg hover:bg-white hover:text-blue-600 transition-colors"
+          data-testid="hero-offers-button"
+        >
+          Zobacz oferty
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Decorative elements -->
+  <div class="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+    <div class="absolute -top-40 -right-40 w-80 h-80 bg-white/10 rounded-full blur-3xl"></div>
+    <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-white/10 rounded-full blur-3xl"></div>
+  </div>
+</section>
+
+<!-- Jak to działa -->
+<section class="py-20 bg-gray-50" data-testid="how-it-works-section">
+  <div class="container mx-auto px-4">
+    <div class="text-center mb-16">
+      <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4" data-testid="how-it-works-title">Jak to działa?</h2>
+      <p class="text-xl text-gray-600 max-w-2xl mx-auto">Prosty proces inwestycyjny w trzech krokach</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+      <!-- Krok 1 -->
+      <div class="text-center" data-testid="step-1">
+        <div
+          class="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-6 text-white text-2xl font-bold"
+        >
+          1
+        </div>
+        <h3 class="text-xl font-semibold text-gray-900 mb-4">Zarejestruj się</h3>
+        <p class="text-gray-600">Utwórz konto w kilka sekund i uzyskaj dostęp do wszystkich ofert inwestycyjnych.</p>
+      </div>
+
+      <!-- Krok 2 -->
+      <div class="text-center" data-testid="step-2">
+        <div
+          class="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-6 text-white text-2xl font-bold"
+        >
+          2
+        </div>
+        <h3 class="text-xl font-semibold text-gray-900 mb-4">Wybierz ofertę</h3>
+        <p class="text-gray-600">
+          Przeglądaj starannie wyselekcjonowane oferty inwestycyjne i znajdź tę idealną dla siebie.
+        </p>
+      </div>
+
+      <!-- Krok 3 -->
+      <div class="text-center" data-testid="step-3">
+        <div
+          class="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-6 text-white text-2xl font-bold"
+        >
+          3
+        </div>
+        <h3 class="text-xl font-semibold text-gray-900 mb-4">Złóż deklarację</h3>
+        <p class="text-gray-600">
+          Podaj kwotę inwestycji i złóż deklarację. Śledź status swojej inwestycji w panelu użytkownika.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Korzyści -->
+<section class="py-20 bg-white" data-testid="benefits-section">
+  <div class="container mx-auto px-4">
+    <div class="text-center mb-16">
+      <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4" data-testid="benefits-title">
+        Dlaczego BlindInvest?
+      </h2>
+      <p class="text-xl text-gray-600 max-w-2xl mx-auto">Odkryj korzyści płynące z korzystania z naszej platformy</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+      <!-- Korzyść 1 -->
+      <div
+        class="text-center p-6 rounded-lg border border-gray-200 hover:shadow-lg transition-shadow"
+        data-testid="benefit-1"
+      >
+        <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+          <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+        </div>
+        <h3 class="text-lg font-semibold text-gray-900 mb-2">Wyselekcjonowane oferty</h3>
+        <p class="text-gray-600">Dostęp tylko do sprawdzonych i atrakcyjnych ofert inwestycyjnych.</p>
+      </div>
+
+      <!-- Korzyść 2 -->
+      <div
+        class="text-center p-6 rounded-lg border border-gray-200 hover:shadow-lg transition-shadow"
+        data-testid="benefit-2"
+      >
+        <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+          <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"
+            ></path>
+          </svg>
+        </div>
+        <h3 class="text-lg font-semibold text-gray-900 mb-2">Oszczędność czasu</h3>
+        <p class="text-gray-600">Nie trać czasu na przeszukiwanie internetu - wszystko w jednym miejscu.</p>
+      </div>
+
+      <!-- Korzyść 3 -->
+      <div
+        class="text-center p-6 rounded-lg border border-gray-200 hover:shadow-lg transition-shadow"
+        data-testid="benefit-3"
+      >
+        <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+          <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+            ></path>
+          </svg>
+        </div>
+        <h3 class="text-lg font-semibold text-gray-900 mb-2">Prosty proces</h3>
+        <p class="text-gray-600">Intuicyjny interfejs i przejrzysty proces składania deklaracji inwestycyjnych.</p>
+      </div>
+
+      <!-- Korzyść 4 -->
+      <div
+        class="text-center p-6 rounded-lg border border-gray-200 hover:shadow-lg transition-shadow"
+        data-testid="benefit-4"
+      >
+        <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+          <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+          </svg>
+        </div>
+        <h3 class="text-lg font-semibold text-gray-900 mb-2">Szybkie decyzje</h3>
+        <p class="text-gray-600">
+          Administratorzy szybko przetwarzają deklaracje, zapewniając szybki zwrot informacji.
+        </p>
+      </div>
+
+      <!-- Korzyść 5 -->
+      <div
+        class="text-center p-6 rounded-lg border border-gray-200 hover:shadow-lg transition-shadow"
+        data-testid="benefit-5"
+      >
+        <div class="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+          <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+            ></path>
+          </svg>
+        </div>
+        <h3 class="text-lg font-semibold text-gray-900 mb-2">Bezpieczeństwo</h3>
+        <p class="text-gray-600">Twoje dane są bezpieczne, a proces inwestycyjny jest przejrzysty i kontrolowany.</p>
+      </div>
+
+      <!-- Korzyść 6 -->
+      <div
+        class="text-center p-6 rounded-lg border border-gray-200 hover:shadow-lg transition-shadow"
+        data-testid="benefit-6"
+      >
+        <div class="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+          <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+            ></path>
+          </svg>
+        </div>
+        <h3 class="text-lg font-semibold text-gray-900 mb-2">Wsparcie</h3>
+        <p class="text-gray-600">Zawsze możesz liczyć na pomoc naszego zespołu w przypadku pytań.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Call to Action -->
+<section class="py-20 bg-gradient-to-r from-blue-600 to-indigo-600 text-white" data-testid="cta-section">
+  <div class="container mx-auto px-4 text-center">
+    <h2 class="text-3xl md:text-4xl font-bold mb-4" data-testid="cta-title">Gotowy na inwestycje?</h2>
+    <p class="text-xl mb-8 text-blue-100 max-w-2xl mx-auto">
+      Dołącz do tysięcy inwestorów, którzy już zaufali BlindInvest. Zarejestruj się już dziś i rozpocznij swoją przygodę
+      z inwestycjami.
+    </p>
+    <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+      <a
+        href="/register"
+        class="px-8 py-4 bg-white text-blue-600 font-semibold rounded-lg hover:bg-gray-50 transition-colors shadow-lg hover:shadow-xl transform hover:-translate-y-1 duration-200"
+        data-testid="cta-register-button"
+      >
+        Zarejestruj się teraz
+      </a>
+      <a
+        href="/login"
+        class="px-8 py-4 border-2 border-white text-white font-semibold rounded-lg hover:bg-white hover:text-blue-600 transition-colors"
+        data-testid="cta-login-button"
+      >
+        Zaloguj się
+      </a>
+    </div>
+  </div>
+</section>

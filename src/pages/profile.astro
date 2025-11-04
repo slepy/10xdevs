@@ -1,0 +1,109 @@
+---
+import AuthenticatedLayout from "../layouts/AuthenticatedLayout.astro";
+import { ChangePasswordForm } from "../components/forms/ChangePasswordForm";
+
+// User is already authenticated by AuthenticatedLayout and middleware
+const user = Astro.locals.user;
+if (!user) {
+  throw new Error("User not authenticated");
+}
+---
+
+<AuthenticatedLayout
+  title="Mój profil | BlindInvest"
+  description="Zarządzaj swoim profilem i ustawieniami konta"
+  showSidebar={true}
+>
+  <div class="max-w-4xl mx-auto">
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+      <!-- Header -->
+      <div class="px-6 py-4 border-b border-gray-200">
+        <h1 class="text-2xl font-bold text-gray-900" data-testid="profile-title">Mój profil</h1>
+        <p class="text-gray-600 mt-1">Zarządzaj swoimi danymi i ustawieniami konta</p>
+      </div>
+
+      <div class="p-6">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <!-- User Information -->
+          <div class="lg:col-span-1">
+            <div class="bg-gray-50 rounded-lg p-6">
+              <h2 class="text-lg font-semibold text-gray-900 mb-4">Informacje o koncie</h2>
+
+              <div class="space-y-4">
+                <!-- Avatar -->
+                <div class="flex items-center justify-center">
+                  <div
+                    class="w-20 h-20 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-white text-2xl font-bold"
+                  >
+                    {
+                      user.firstName && user.lastName
+                        ? `${user.firstName[0]}${user.lastName[0]}`.toUpperCase()
+                        : user.email[0].toUpperCase()
+                    }
+                  </div>
+                </div>
+
+                <!-- User Details -->
+                <div class="text-center space-y-2">
+                  <h3 class="text-lg font-medium text-gray-900">
+                    {user.firstName && user.lastName ? `${user.firstName} ${user.lastName}` : "Użytkownik"}
+                  </h3>
+                  <p class="text-sm text-gray-600">{user.email}</p>
+                  <span
+                    class={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
+                      user.role === "admin" ? "bg-purple-100 text-purple-800" : "bg-blue-100 text-blue-800"
+                    }`}
+                  >
+                    {user.role === "admin" ? "Administrator" : "Inwestor"}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Settings -->
+          <div class="lg:col-span-2 space-y-6">
+            <!-- Change Password Section -->
+            <div class="bg-white border border-gray-200 rounded-lg p-6">
+              <h2 class="text-lg font-semibold text-gray-900 mb-4">Zmiana hasła</h2>
+              <p class="text-gray-600 text-sm mb-6">
+                Wprowadź swoje aktualne hasło oraz nowe hasło, które chcesz ustawić.
+              </p>
+
+              <ChangePasswordForm client:load />
+            </div>
+
+            <!-- Account Settings -->
+            <div class="bg-white border border-gray-200 rounded-lg p-6">
+              <h2 class="text-lg font-semibold text-gray-900 mb-4">Ustawienia konta</h2>
+
+              <div class="space-y-4">
+                <div class="flex items-center justify-between py-3 border-b border-gray-100">
+                  <div>
+                    <h3 class="text-sm font-medium text-gray-900">Powiadomienia e-mail</h3>
+                    <p class="text-xs text-gray-600">Otrzymuj powiadomienia o nowych ofertach</p>
+                  </div>
+                  <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" class="sr-only peer" checked disabled />
+                    <div
+                      class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"
+                    >
+                    </div>
+                  </label>
+                </div>
+
+                <div class="flex items-center justify-between py-3">
+                  <div>
+                    <h3 class="text-sm font-medium text-gray-900">Dwuskładnikowe uwierzytelnianie</h3>
+                    <p class="text-xs text-gray-600">Dodatkowa warstwa bezpieczeństwa</p>
+                  </div>
+                  <span class="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">Wkrótce</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</AuthenticatedLayout>
